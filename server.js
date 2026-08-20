@@ -929,7 +929,7 @@ async function tradingCycle() {
     return;
 
   console.log(
-    "Running automated v0.8 paper analysis..."
+    "Running automated v0.9 paper analysis..."
   );
 
   await performAnalysis(
@@ -1075,7 +1075,7 @@ function signalStats() {
 function apiState() {
 
   return {
-    version: "0.8",
+    version: "0.9",
 
     schemaVersion:
       state.schemaVersion,
@@ -1309,7 +1309,7 @@ const server =
           200,
           {
             ok: true,
-            version: "0.8",
+            version: "0.9",
             automation:
               state.automation,
             serverTime:
@@ -1452,7 +1452,7 @@ server.listen(
   () => {
 
     console.log(
-      "Chinab's AI Trade Platform v0.8 running on port",
+      "Chinab's AI Trade Platform v0.9 running on port",
       PORT
     );
 
