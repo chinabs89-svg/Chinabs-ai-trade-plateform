@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chinab's AI Trade Platform v0.5</title>
+<title>Chinab's AI Trade Platform v0.6</title>
 
 <style>
 *{box-sizing:border-box}
@@ -51,7 +51,6 @@ header p{color:#9fb0c5;margin-bottom:0}
 .red{color:#ff6b6b}
 .yellow{color:#f5c451}
 .blue{color:#60a5fa}
-.orange{color:#f59e0b}
 
 button{
   width:100%;
@@ -63,30 +62,10 @@ button{
   font-weight:bold;
   cursor:pointer
 }
-
 .primary{background:#3b82f6;color:white}
-.long{background:#16a36a;color:white}
-.short{background:#c84d4d;color:white}
+.success{background:#16a36a;color:white}
+.danger{background:#c84d4d;color:white}
 .secondary{background:#27384d;color:white}
-
-select{
-  width:100%;
-  padding:12px;
-  border-radius:10px;
-  margin-top:8px;
-  background:#07111f;
-  color:white;
-  border:1px solid #33465e;
-  font-size:16px
-}
-
-.signal-box{
-  margin-top:18px;
-  padding:16px;
-  border-radius:12px;
-  background:#0a1625;
-  border:1px solid #2a3a50
-}
 
 .row{
   display:flex;
@@ -97,25 +76,18 @@ select{
 }
 .row:last-child{border-bottom:0}
 
-.scorebar{
-  height:12px;
-  background:#24354b;
-  border-radius:10px;
-  overflow:hidden;
-  margin-top:6px
-}
-.scorefill{
-  height:100%;
-  background:#36d399;
-  width:0%
+.signal-box,.trade-card{
+  margin-top:14px;
+  padding:15px;
+  border-radius:12px;
+  background:#0a1625;
+  border:1px solid #2a3a50
 }
 
-.trade-card{
-  background:#0a1625;
-  border:1px solid #2a3a50;
-  padding:14px;
-  border-radius:12px;
-  margin-top:12px
+.small{
+  color:#94a7bd;
+  font-size:13px;
+  line-height:1.5
 }
 
 .history-item{
@@ -123,10 +95,13 @@ select{
   border-bottom:1px solid #1e3045
 }
 
-.small{
-  color:#94a7bd;
-  font-size:13px;
-  line-height:1.5
+.status-dot{
+  display:inline-block;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#36d399;
+  margin-right:7px
 }
 
 footer{
@@ -141,13 +116,13 @@ footer{
 
 <header>
 <h1>Chinab's AI Trade Platform</h1>
-<p>Two-direction paper trading engine — Version 0.5</p>
+<p>Automated paper-testing engine — Version 0.6</p>
 </header>
 
 <div class="container">
 
 <div class="warning">
-🧪 PAPER TRADING ONLY — LONG and SHORT trades are simulated. No real money or leverage is used.
+🧪 PAPER TRADING ONLY — Automation is simulated. No real money, leverage, bank account or exchange is connected.
 </div>
 
 <div class="grid">
@@ -168,57 +143,61 @@ footer{
 </div>
 
 <div class="card">
-<div class="label">24h Change</div>
-<div class="value" id="change">Loading...</div>
+<div class="label">Automation</div>
+<div class="value" id="automationStatus">OFF</div>
 </div>
 
 </div>
 
 <div class="panel">
 
-<h2>🤖 Strategy Engine</h2>
+<h2>🤖 Auto Paper Trader</h2>
 
-<div class="label">Trade horizon</div>
+<button class="success" id="autoButton" onclick="toggleAutomation()">
+Start Automated Paper Testing
+</button>
 
-<select id="horizon">
-<option value="1">1 Day</option>
-<option value="2">2 Days</option>
-<option value="3">3 Days</option>
-<option value="4">4 Days</option>
-</select>
-
-<button class="primary" onclick="analyzeMarket()">
-Analyze BTC/CAD
+<button class="primary" onclick="runAnalysis()">
+Analyze Now
 </button>
 
 <div id="analysis" class="signal-box">
-Waiting for analysis...
+Waiting for market analysis...
 </div>
+
+<p class="small">
+Automation checks the strategy approximately once per minute while this page remains open.
+</p>
 
 </div>
 
 <div class="panel">
 
-<h2>📊 Market Signals</h2>
+<h2>📊 Strategy Indicators</h2>
 
 <div class="row">
-<span>Trend</span>
-<strong id="trend">-</strong>
+<span>24h Change</span>
+<strong id="change24">-</strong>
 </div>
 
 <div class="row">
-<span>Momentum</span>
-<strong id="momentum">-</strong>
+<span>Short MA</span>
+<strong id="shortMA">-</strong>
 </div>
 
 <div class="row">
-<span>Volatility</span>
-<strong id="volatility">-</strong>
+<span>Long MA</span>
+<strong id="longMA">-</strong>
 </div>
 
 <div class="row">
-<span>Market Regime</span>
-<strong id="regime">-</strong>
+<span>RSI-style Momentum</span>
+<strong id="rsi">-</strong>
+</div>
+
+<div class="row">
+<span>Strategy Signal</span>
+<strong id="strategySignal">WAIT</strong>
 </div>
 
 </div>
@@ -235,7 +214,7 @@ Waiting for analysis...
 
 <div class="panel">
 
-<h2>🏆 Performance</h2>
+<h2>🏆 Performance Dashboard</h2>
 
 <div class="row">
 <span>Total Trades</span>
@@ -262,12 +241,16 @@ Waiting for analysis...
 <strong id="realizedPnl">$0.00</strong>
 </div>
 
+<div class="row">
+<span>Maximum Drawdown</span>
+<strong id="maxDrawdown">0.00%</strong>
+</div>
+
 </div>
 
 <div class="panel">
 
 <h2>🧾 Trade History</h2>
-
 <div id="history">
 <p class="small">No completed trades yet.</p>
 </div>
@@ -276,16 +259,11 @@ Waiting for analysis...
 
 <div class="panel">
 
-<h2>🛡️ Risk Controls</h2>
+<h2>🛡️ Safety Rules</h2>
 
 <div class="row">
 <span>Risk per trade</span>
-<strong>1%</strong>
-</div>
-
-<div class="row">
-<span>Maximum daily loss</span>
-<strong>3%</strong>
+<strong>0.75%</strong>
 </div>
 
 <div class="row">
@@ -294,12 +272,17 @@ Waiting for analysis...
 </div>
 
 <div class="row">
+<span>Extreme-volatility filter</span>
+<strong class="green">ON</strong>
+</div>
+
+<div class="row">
 <span>Leverage</span>
 <strong class="green">OFF</strong>
 </div>
 
 <div class="row">
-<span>Live Trading</span>
+<span>Live trading</span>
 <strong class="red">OFF</strong>
 </div>
 
@@ -308,28 +291,32 @@ Waiting for analysis...
 </div>
 
 <footer>
-Chinab's AI Trade Platform — Version 0.5
+Chinab's AI Trade Platform — Version 0.6
 </footer>
 
 <script>
 
 const STARTING_BALANCE = 10000;
-const RISK_PERCENT = 0.01;
+const RISK_PERCENT = 0.0075;
 
-let marketData = null;
-let proposal = null;
+let market = null;
+let priceHistory = [];
+let automationTimer = null;
 
 let state = JSON.parse(
-  localStorage.getItem("chinab_v05_state")
+  localStorage.getItem("chinab_v06_state")
 ) || {
   cash: STARTING_BALANCE,
   openTrade: null,
-  history: []
+  history: [],
+  automation: false,
+  peakPortfolio: STARTING_BALANCE,
+  maxDrawdown: 0
 };
 
-function saveState(){
+function save(){
   localStorage.setItem(
-    "chinab_v05_state",
+    "chinab_v06_state",
     JSON.stringify(state)
   );
 }
@@ -345,34 +332,43 @@ async function loadMarket(){
 
   try{
 
-    const url =
-    "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=cad&include_24hr_change=true";
+    const simple =
+      "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=cad&include_24hr_change=true";
 
-    const res = await fetch(url);
+    const chart =
+      "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=cad&days=7";
 
-    if(!res.ok) throw new Error("Market data error");
+    const [simpleRes,chartRes] =
+      await Promise.all([
+        fetch(simple),
+        fetch(chart)
+      ]);
 
-    const data = await res.json();
+    if(!simpleRes.ok || !chartRes.ok)
+      throw new Error("Market request failed");
 
-    marketData = {
-      price:data.bitcoin.cad,
-      change:data.bitcoin.cad_24h_change
+    const simpleData =
+      await simpleRes.json();
+
+    const chartData =
+      await chartRes.json();
+
+    market={
+      price:simpleData.bitcoin.cad,
+      change:simpleData.bitcoin.cad_24h_change
     };
 
+    priceHistory =
+      chartData.prices.map(x=>x[1]);
+
     document.getElementById("btcPrice").innerText =
-      money(marketData.price);
+      money(market.price);
 
-    const changeEl =
-      document.getElementById("change");
+    document.getElementById("change24").innerText =
+      market.change.toFixed(2)+"%";
 
-    changeEl.innerText =
-      marketData.change.toFixed(2)+"%";
-
-    changeEl.className =
-      "value "+(marketData.change>=0?"green":"red");
-
-    updateSignals();
-    updateOpenTrade();
+    updateIndicators();
+    updateTrade();
     updatePortfolio();
 
   }catch(e){
@@ -384,276 +380,302 @@ async function loadMarket(){
 
 }
 
-function trendLabel(change){
-
-  if(change>=5) return "Strong Bullish";
-  if(change>=2) return "Bullish";
-  if(change<=-5) return "Strong Bearish";
-  if(change<=-2) return "Bearish";
-  return "Neutral";
+function average(arr){
+  if(!arr.length) return 0;
+  return arr.reduce((a,b)=>a+b,0)/arr.length;
 }
 
-function volatilityLabel(change){
+function calculateRSI(prices,period=14){
 
-  const x=Math.abs(change);
+  if(prices.length<period+1)
+    return 50;
 
-  if(x>=8) return "Extreme";
-  if(x>=5) return "High";
-  if(x>=2) return "Medium";
-  return "Low";
-}
+  const recent =
+    prices.slice(-(period+1));
 
-function regimeLabel(change){
+  let gains=0;
+  let losses=0;
 
-  const x=Math.abs(change);
+  for(let i=1;i<recent.length;i++){
 
-  if(x>=8) return "Shock / High Risk";
-  if(change>=2) return "Trending Up";
-  if(change<=-2) return "Trending Down";
-  return "Sideways";
-}
+    const diff =
+      recent[i]-recent[i-1];
 
-function updateSignals(){
+    if(diff>0)
+      gains+=diff;
+    else
+      losses+=Math.abs(diff);
 
-  if(!marketData) return;
+  }
 
-  document.getElementById("trend").innerText =
-    trendLabel(marketData.change);
+  if(losses===0) return 100;
 
-  document.getElementById("momentum").innerText =
-    marketData.change.toFixed(2)+"%";
+  const rs =
+    (gains/period)/(losses/period);
 
-  document.getElementById("volatility").innerText =
-    volatilityLabel(marketData.change);
-
-  document.getElementById("regime").innerText =
-    regimeLabel(marketData.change);
+  return 100-(100/(1+rs));
 
 }
 
-function analyzeMarket(){
+function getIndicators(){
 
-  if(!marketData){
-    alert("Market data still loading.");
+  if(!market || priceHistory.length<30)
+    return null;
+
+  const shortPrices =
+    priceHistory.slice(-12);
+
+  const longPrices =
+    priceHistory.slice(-36);
+
+  const shortMA =
+    average(shortPrices);
+
+  const longMA =
+    average(longPrices);
+
+  const rsi =
+    calculateRSI(priceHistory,14);
+
+  return {
+    shortMA,
+    longMA,
+    rsi
+  };
+
+}
+
+function determineSignal(){
+
+  const ind=getIndicators();
+
+  if(!ind)
+    return {
+      signal:"WAIT",
+      score:0,
+      reason:"Insufficient historical data."
+    };
+
+  const change=market.change;
+
+  if(Math.abs(change)>=8){
+
+    return{
+      signal:"WAIT",
+      score:80,
+      reason:
+      "Extreme 24-hour volatility filter is active."
+    };
+
+  }
+
+  let longScore=0;
+  let shortScore=0;
+
+  if(ind.shortMA>ind.longMA)
+    longScore+=2;
+  else
+    shortScore+=2;
+
+  if(ind.rsi>=52 && ind.rsi<=70)
+    longScore+=2;
+
+  if(ind.rsi<=48 && ind.rsi>=30)
+    shortScore+=2;
+
+  if(change>0)
+    longScore+=1;
+  else
+    shortScore+=1;
+
+  if(longScore>=4){
+
+    return{
+      signal:"LONG",
+      score:longScore,
+      reason:
+      "Trend, moving averages and momentum favour upside."
+    };
+
+  }
+
+  if(shortScore>=4){
+
+    return{
+      signal:"SHORT",
+      score:shortScore,
+      reason:
+      "Trend, moving averages and momentum favour downside."
+    };
+
+  }
+
+  return{
+    signal:"WAIT",
+    score:Math.max(longScore,shortScore),
+    reason:
+    "Indicators do not agree strongly enough."
+  };
+
+}
+
+function updateIndicators(){
+
+  const ind=getIndicators();
+
+  if(!ind) return;
+
+  document.getElementById("shortMA").innerText =
+    money(ind.shortMA);
+
+  document.getElementById("longMA").innerText =
+    money(ind.longMA);
+
+  document.getElementById("rsi").innerText =
+    ind.rsi.toFixed(1);
+
+}
+
+function runAnalysis(auto=false){
+
+  if(!market){
+    if(!auto) alert("Market data is still loading.");
     return;
   }
 
-  const price=marketData.price;
-  const change=marketData.change;
-  const horizon=Number(
-    document.getElementById("horizon").value
-  );
+  const decision=determineSignal();
 
-  let signal="WAIT";
-  let color="yellow";
-  let score=50;
-  let reasons=[];
+  const signalEl =
+    document.getElementById("strategySignal");
 
-  proposal=null;
+  signalEl.innerText =
+    decision.signal;
 
-  if(change>=2 && change<7){
+  signalEl.className =
+    decision.signal==="LONG"
+    ?"green":
+    decision.signal==="SHORT"
+    ?"red":"yellow";
 
-    signal="LONG";
-    color="green";
-    score=Math.min(82,Math.round(58+change*3));
+  document.getElementById("analysis").innerHTML = `
 
-    reasons.push("Positive momentum is confirmed.");
-    reasons.push("Market is trending upward without reaching the extreme-risk threshold.");
-
-  }else if(change<=-2 && change>-7){
-
-    signal="SHORT";
-    color="red";
-    score=Math.min(82,Math.round(58+Math.abs(change)*3));
-
-    reasons.push("Negative momentum is confirmed.");
-    reasons.push("Market is trending downward without reaching the extreme-risk threshold.");
-
-  }else if(Math.abs(change)>=7){
-
-    signal="WAIT";
-    color="yellow";
-    score=75;
-
-    reasons.push("BTC has already made a very large 24-hour move.");
-    reasons.push("The model avoids chasing extreme moves in either direction.");
-
-  }else{
-
-    signal="WAIT";
-    color="yellow";
-    score=60;
-
-    reasons.push("Trend strength is insufficient.");
-    reasons.push("Capital preservation takes priority over forcing a trade.");
-
-  }
-
-  let tradeHTML="";
-
-  if(signal==="LONG" || signal==="SHORT"){
-
-    const stopPct=0.03;
-    const targetPct=0.035+(horizon*0.008);
-
-    let stop,target;
-
-    if(signal==="LONG"){
-      stop=price*(1-stopPct);
-      target=price*(1+targetPct);
-    }else{
-      stop=price*(1+stopPct);
-      target=price*(1-targetPct);
-    }
-
-    const maxRisk=
-      STARTING_BALANCE*RISK_PERCENT;
-
-    const riskPerBTC=
-      Math.abs(price-stop);
-
-    let quantity=
-      maxRisk/riskPerBTC;
-
-    let positionValue=
-      quantity*price;
-
-    if(positionValue>state.cash){
-      positionValue=state.cash;
-      quantity=positionValue/price;
-    }
-
-    proposal={
-      side:signal,
-      entry:price,
-      stop:stop,
-      target:target,
-      quantity:quantity,
-      positionValue:positionValue,
-      horizon:horizon,
-      openedAt:Date.now()
-    };
-
-    tradeHTML=`
-
-      <div class="row">
-      <span>Entry</span>
-      <strong>${money(price)}</strong>
-      </div>
-
-      <div class="row">
-      <span>Stop Loss</span>
-      <strong class="red">${money(stop)}</strong>
-      </div>
-
-      <div class="row">
-      <span>Take Profit</span>
-      <strong class="green">${money(target)}</strong>
-      </div>
-
-      <div class="row">
-      <span>Paper Position</span>
-      <strong>${money(positionValue)}</strong>
-      </div>
-
-      <button
-      class="${signal==="LONG"?"long":"short"}"
-      onclick="openPaperTrade()">
-      Open ${signal} Paper Trade
-      </button>
-    `;
-
-  }
-
-  document.getElementById("analysis").innerHTML=`
-
-    <h2 class="${color}">
-    ${signal}
+    <h2 class="${
+      decision.signal==="LONG"
+      ?"green":
+      decision.signal==="SHORT"
+      ?"red":"yellow"
+    }">
+      ${decision.signal}
     </h2>
 
     <div class="row">
-    <span>Rule Score</span>
-    <strong>${score}%</strong>
+      <span>Rule Agreement</span>
+      <strong>${decision.score}/5</strong>
     </div>
 
-    <div class="scorebar">
-    <div class="scorefill" style="width:${score}%"></div>
-    </div>
-
-    <div class="row">
-    <span>Horizon</span>
-    <strong>${horizon} Day${horizon>1?"s":""}</strong>
-    </div>
-
-    ${tradeHTML}
-
-    <h3>Why?</h3>
-
-    <ul>
-    ${reasons.map(x=>"<li>"+x+"</li>").join("")}
-    </ul>
+    <p>${decision.reason}</p>
 
     <p class="small">
-    This is a rule-based simulation score, not a probability of profit.
-    Version 0.5 does not use leverage or predictive machine learning.
+      This strategy is experimental paper-trading logic.
+      Rule agreement is not a probability of profit.
     </p>
   `;
 
+  if(
+    auto &&
+    !state.openTrade &&
+    (
+      decision.signal==="LONG" ||
+      decision.signal==="SHORT"
+    )
+  ){
+    openAutomaticTrade(decision.signal);
+  }
+
 }
 
-function openPaperTrade(){
+function openAutomaticTrade(side){
 
-  if(!proposal){
-    alert("Analyze the market first.");
+  if(state.openTrade || !market)
     return;
+
+  const entry=market.price;
+
+  const stopDistance =
+    entry*0.025;
+
+  const riskCash =
+    getPortfolioValue()*RISK_PERCENT;
+
+  let quantity =
+    riskCash/stopDistance;
+
+  let positionValue =
+    quantity*entry;
+
+  if(positionValue>state.cash){
+    positionValue=state.cash;
+    quantity=positionValue/entry;
   }
 
-  if(state.openTrade){
-    alert("Only one trade may be open at a time.");
-    return;
+  let stop,target;
+
+  if(side==="LONG"){
+    stop=entry*0.975;
+    target=entry*1.05;
+  }else{
+    stop=entry*1.025;
+    target=entry*0.95;
   }
 
-  state.openTrade={...proposal};
+  state.openTrade={
+    side,
+    entry,
+    stop,
+    target,
+    quantity,
+    positionValue,
+    openedAt:Date.now()
+  };
 
-  state.cash-=proposal.positionValue;
+  state.cash-=positionValue;
 
-  proposal=null;
+  save();
 
-  saveState();
-  updateOpenTrade();
+  updateTrade();
   updatePortfolio();
 
 }
 
-function currentTradePnl(){
+function tradePnl(){
 
-  if(!state.openTrade || !marketData) return 0;
+  if(!state.openTrade || !market)
+    return 0;
 
   const t=state.openTrade;
 
-  if(t.side==="LONG"){
-    return (marketData.price-t.entry)*t.quantity;
-  }else{
-    return (t.entry-marketData.price)*t.quantity;
-  }
+  if(t.side==="LONG")
+    return (market.price-t.entry)*t.quantity;
+
+  return (t.entry-market.price)*t.quantity;
 
 }
 
-function updateOpenTrade(){
+function updateTrade(){
 
-  const area=
+  const area =
     document.getElementById("openTradeArea");
 
-  if(!state.openTrade || !marketData){
+  if(!state.openTrade || !market){
 
-    area.innerHTML=
+    area.innerHTML =
       '<p class="small">No open paper trade.</p>';
 
     return;
   }
 
   const t=state.openTrade;
-  const pnl=currentTradePnl();
+  const pnl=tradePnl();
 
   area.innerHTML=`
 
@@ -661,9 +683,9 @@ function updateOpenTrade(){
 
     <div class="row">
     <span>Side</span>
-    <strong class="${t.side==="LONG"?"green":"red"}">
-    ${t.side}
-    </strong>
+    <strong class="${
+      t.side==="LONG"?"green":"red"
+    }">${t.side}</strong>
     </div>
 
     <div class="row">
@@ -672,8 +694,8 @@ function updateOpenTrade(){
     </div>
 
     <div class="row">
-    <span>Current BTC</span>
-    <strong>${money(marketData.price)}</strong>
+    <span>Current</span>
+    <strong>${money(market.price)}</strong>
     </div>
 
     <div class="row">
@@ -682,7 +704,7 @@ function updateOpenTrade(){
     </div>
 
     <div class="row">
-    <span>Unrealized P&L</span>
+    <span>P&L</span>
     <strong class="${pnl>=0?"green":"red"}">
     ${money(pnl)}
     </strong>
@@ -698,7 +720,9 @@ function updateOpenTrade(){
     <strong class="green">${money(t.target)}</strong>
     </div>
 
-    <button class="secondary" onclick="closeTrade('Manual close')">
+    <button
+    class="secondary"
+    onclick="closeTrade('Manual close')">
     Close Paper Trade
     </button>
 
@@ -707,80 +731,99 @@ function updateOpenTrade(){
 
   if(
     t.side==="LONG" &&
-    marketData.price<=t.stop
-  ){
-    closeTrade("Stop loss reached");
-  }
+    market.price<=t.stop
+  )
+    closeTrade("Stop loss");
 
   if(
     t.side==="LONG" &&
-    marketData.price>=t.target
-  ){
-    closeTrade("Take profit reached");
-  }
+    market.price>=t.target
+  )
+    closeTrade("Take profit");
 
   if(
     t.side==="SHORT" &&
-    marketData.price>=t.stop
-  ){
-    closeTrade("Stop loss reached");
-  }
+    market.price>=t.stop
+  )
+    closeTrade("Stop loss");
 
   if(
     t.side==="SHORT" &&
-    marketData.price<=t.target
-  ){
-    closeTrade("Take profit reached");
-  }
+    market.price<=t.target
+  )
+    closeTrade("Take profit");
 
 }
 
 function closeTrade(reason){
 
-  if(!state.openTrade || !marketData) return;
+  if(!state.openTrade || !market)
+    return;
 
   const t=state.openTrade;
-  const pnl=currentTradePnl();
+  const pnl=tradePnl();
 
-  state.cash+=t.positionValue+pnl;
+  state.cash +=
+    t.positionValue+pnl;
 
   state.history.unshift({
     side:t.side,
     entry:t.entry,
-    exit:marketData.price,
-    pnl:pnl,
-    reason:reason,
+    exit:market.price,
+    pnl,
+    reason,
     closedAt:Date.now()
   });
 
   state.openTrade=null;
 
-  saveState();
+  save();
 
   updatePortfolio();
-  updateOpenTrade();
+  updateTrade();
   updatePerformance();
   updateHistory();
 
-  alert(reason+"\\nPaper P&L: "+money(pnl));
+}
+
+function getPortfolioValue(){
+
+  let total=state.cash;
+
+  if(state.openTrade)
+    total +=
+      state.openTrade.positionValue+
+      tradePnl();
+
+  return total;
 
 }
 
 function updatePortfolio(){
 
-  let total=state.cash;
+  const total =
+    getPortfolioValue();
 
-  if(state.openTrade){
-    total+=
-      state.openTrade.positionValue+
-      currentTradePnl();
-  }
+  if(total>state.peakPortfolio)
+    state.peakPortfolio=total;
 
-  document.getElementById("cash").innerText=
+  const drawdown =
+    ((state.peakPortfolio-total)/
+      state.peakPortfolio)*100;
+
+  if(drawdown>state.maxDrawdown)
+    state.maxDrawdown=drawdown;
+
+  document.getElementById("cash").innerText =
     money(state.cash);
 
-  document.getElementById("portfolio").innerText=
+  document.getElementById("portfolio").innerText =
     money(total);
+
+  document.getElementById("maxDrawdown").innerText =
+    state.maxDrawdown.toFixed(2)+"%";
+
+  save();
 
 }
 
@@ -788,69 +831,67 @@ function updatePerformance(){
 
   const total=state.history.length;
 
-  const wins=
+  const wins =
     state.history.filter(x=>x.pnl>0).length;
 
-  const losses=
+  const losses =
     state.history.filter(x=>x.pnl<0).length;
 
-  const realized=
+  const pnl =
     state.history.reduce(
       (sum,x)=>sum+x.pnl,0
     );
 
-  const rate=
-    total===0?0:(wins/total)*100;
-
-  document.getElementById("totalTrades").innerText=
+  document.getElementById("totalTrades").innerText =
     total;
 
-  document.getElementById("wins").innerText=
+  document.getElementById("wins").innerText =
     wins;
 
-  document.getElementById("losses").innerText=
+  document.getElementById("losses").innerText =
     losses;
 
-  document.getElementById("winRate").innerText=
-    rate.toFixed(1)+"%";
+  document.getElementById("winRate").innerText =
+    total ?
+    ((wins/total)*100).toFixed(1)+"%" :
+    "0%";
 
-  const pnlEl=
-    document.getElementById("realizedPnl");
-
-  pnlEl.innerText=money(realized);
-
-  pnlEl.className=
-    realized>=0?"green":"red";
+  document.getElementById("realizedPnl").innerText =
+    money(pnl);
 
 }
 
 function updateHistory(){
 
-  const area=document.getElementById("history");
+  const area =
+    document.getElementById("history");
 
-  if(state.history.length===0){
+  if(!state.history.length){
 
-    area.innerHTML=
+    area.innerHTML =
       '<p class="small">No completed trades yet.</p>';
 
     return;
   }
 
-  area.innerHTML=
-    state.history.slice(0,10).map(t=>`
+  area.innerHTML =
+    state.history.slice(0,15).map(t=>`
 
       <div class="history-item">
 
       <div class="row">
       <span>${t.side}</span>
-      <strong class="${t.pnl>=0?"green":"red"}">
+      <strong class="${
+        t.pnl>=0?"green":"red"
+      }">
       ${money(t.pnl)}
       </strong>
       </div>
 
       <div class="small">
-      Entry ${money(t.entry)} →
-      Exit ${money(t.exit)}
+      ${money(t.entry)}
+      →
+      ${money(t.exit)}
       <br>
       ${t.reason}
       </div>
@@ -861,10 +902,93 @@ function updateHistory(){
 
 }
 
-loadMarket();
-updatePerformance();
-updateHistory();
-updatePortfolio();
+function toggleAutomation(){
+
+  state.automation =
+    !state.automation;
+
+  save();
+
+  setAutomationUI();
+
+  if(state.automation){
+
+    runAnalysis(true);
+
+    automationTimer =
+      setInterval(async()=>{
+
+        await loadMarket();
+        runAnalysis(true);
+
+      },60000);
+
+  }else{
+
+    clearInterval(automationTimer);
+    automationTimer=null;
+
+  }
+
+}
+
+function setAutomationUI(){
+
+  const status =
+    document.getElementById("automationStatus");
+
+  const button =
+    document.getElementById("autoButton");
+
+  if(state.automation){
+
+    status.innerHTML =
+      '<span class="green">ON</span>';
+
+    button.innerText =
+      "Stop Automated Paper Testing";
+
+    button.className =
+      "danger";
+
+  }else{
+
+    status.innerText =
+      "OFF";
+
+    button.innerText =
+      "Start Automated Paper Testing";
+
+    button.className =
+      "success";
+
+  }
+
+}
+
+async function start(){
+
+  /*
+  Automation is deliberately reset OFF after reload.
+  This avoids implying that GitHub Pages runs in
+  the background when Safari is closed.
+  */
+
+  state.automation=false;
+
+  save();
+
+  setAutomationUI();
+
+  await loadMarket();
+
+  updatePerformance();
+  updateHistory();
+  updatePortfolio();
+
+}
+
+start();
 
 setInterval(loadMarket,60000);
 
