@@ -1,566 +1,729 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chinab's AI Trade Platform v0.3</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chinab's AI Trade Platform v0.4</title>
 
-  <style>
-    * { box-sizing: border-box; }
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#07111f;
+  color:white
+}
+header{
+  padding:22px;
+  background:#0d1b2a;
+  border-bottom:1px solid #25354a
+}
+header h1{margin:0;font-size:24px}
+header p{color:#9fb0c5;margin-bottom:0}
+.container{padding:18px;max-width:1100px;margin:auto}
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #07111f;
-      color: white;
-    }
+.warning{
+  background:#30260b;
+  border:1px solid #7c6418;
+  padding:14px;
+  border-radius:14px;
+  margin-bottom:18px
+}
 
-    header {
-      padding: 22px;
-      background: #0d1b2a;
-      border-bottom: 1px solid #25354a;
-    }
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:14px
+}
 
-    header h1 {
-      margin: 0;
-      font-size: 24px;
-    }
+.card,.panel{
+  background:#101d2d;
+  border:1px solid #26384e;
+  padding:18px;
+  border-radius:16px
+}
 
-    header p {
-      margin-bottom: 0;
-      color: #9fb0c5;
-    }
+.panel{margin-top:18px}
+.label{color:#94a7bd;font-size:14px}
+.value{font-size:27px;font-weight:bold;margin-top:8px}
 
-    .container {
-      padding: 18px;
-      max-width: 1100px;
-      margin: auto;
-    }
+.green{color:#36d399}
+.red{color:#ff6b6b}
+.yellow{color:#f5c451}
+.blue{color:#60a5fa}
 
-    .warning {
-      background: #30260b;
-      border: 1px solid #7c6418;
-      padding: 14px;
-      border-radius: 14px;
-      margin-bottom: 18px;
-    }
+button{
+  width:100%;
+  padding:15px;
+  margin-top:12px;
+  border:0;
+  border-radius:10px;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer
+}
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 15px;
-    }
+.scan{background:#3b82f6;color:white}
+.paper{background:#16a36a;color:white}
+.secondary{background:#27384d;color:white}
 
-    .card,
-    .panel {
-      background: #101d2d;
-      border: 1px solid #26384e;
-      padding: 18px;
-      border-radius: 16px;
-    }
+select{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  margin-top:8px;
+  background:#07111f;
+  color:white;
+  border:1px solid #33465e;
+  font-size:16px
+}
 
-    .panel {
-      margin-top: 18px;
-    }
+.signal-box{
+  margin-top:18px;
+  padding:16px;
+  border-radius:12px;
+  background:#0a1625;
+  border:1px solid #2a3a50
+}
 
-    .label {
-      color: #94a7bd;
-      font-size: 14px;
-    }
+.row{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding:10px 0;
+  border-bottom:1px solid #1e3045
+}
+.row:last-child{border-bottom:0}
 
-    .value {
-      font-size: 28px;
-      font-weight: bold;
-      margin-top: 8px;
-    }
+.signal-title{
+  font-size:34px;
+  margin:0 0 12px
+}
 
-    .green { color: #36d399; }
-    .red { color: #ff6b6b; }
-    .yellow { color: #f5c451; }
-    .blue { color: #60a5fa; }
+.confidence{
+  height:12px;
+  background:#24354b;
+  border-radius:10px;
+  overflow:hidden;
+  margin-top:6px
+}
 
-    button {
-      width: 100%;
-      padding: 15px;
-      margin-top: 12px;
-      border: 0;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.confidence-fill{
+  height:100%;
+  background:#36d399;
+  width:0%
+}
 
-    .scan {
-      background: #3b82f6;
-      color: white;
-    }
+.small{
+  color:#94a7bd;
+  font-size:13px;
+  line-height:1.5
+}
 
-    select {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      margin-top: 8px;
-      background: #07111f;
-      color: white;
-      border: 1px solid #33465e;
-      font-size: 16px;
-    }
+.bank-buttons{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px
+}
 
-    .signal-box {
-      margin-top: 18px;
-      padding: 16px;
-      border-radius: 12px;
-      background: #0a1625;
-      border: 1px solid #2a3a50;
-    }
+.trade-card{
+  background:#0a1625;
+  border:1px solid #2a3a50;
+  padding:14px;
+  border-radius:12px;
+  margin-top:12px
+}
 
-    .row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 9px 0;
-      border-bottom: 1px solid #1e3045;
-    }
-
-    .row:last-child {
-      border-bottom: 0;
-    }
-
-    .signal-title {
-      font-size: 32px;
-      margin: 0 0 12px 0;
-    }
-
-    .small {
-      font-size: 13px;
-      color: #94a7bd;
-      line-height: 1.5;
-    }
-
-    footer {
-      text-align: center;
-      color: #73869d;
-      padding: 30px;
-    }
-  </style>
+footer{
+  text-align:center;
+  color:#73869d;
+  padding:30px
+}
+</style>
 </head>
 
 <body>
 
 <header>
-  <h1>Chinab's AI Trade Platform</h1>
-  <p>Live market analysis & paper trading — Version 0.3</p>
+<h1>Chinab's AI Trade Platform</h1>
+<p>Market intelligence & paper trading — Version 0.4</p>
 </header>
 
 <div class="container">
 
-  <div class="warning">
-    🧪 PAPER TRADING ONLY — No real money is being traded.
-  </div>
+<div class="warning">
+🧪 PAPER TRADING MODE — Deposit, withdrawal and trades are simulated. No real money moves.
+</div>
 
-  <div class="grid">
+<div class="grid">
 
-    <div class="card">
-      <div class="label">Paper Portfolio</div>
-      <div class="value" id="portfolioValue">$10,000.00</div>
-    </div>
+<div class="card">
+<div class="label">Paper Portfolio</div>
+<div class="value" id="portfolio">$10,000.00</div>
+</div>
 
-    <div class="card">
-      <div class="label">BTC / CAD Live Price</div>
-      <div class="value" id="btcPrice">Loading...</div>
-    </div>
+<div class="card">
+<div class="label">Available CAD</div>
+<div class="value" id="cash">$10,000.00</div>
+</div>
 
-    <div class="card">
-      <div class="label">24h Change</div>
-      <div class="value" id="change24h">Loading...</div>
-    </div>
+<div class="card">
+<div class="label">BTC / CAD</div>
+<div class="value" id="btcPrice">Loading...</div>
+</div>
 
-    <div class="card">
-      <div class="label">System Status</div>
-      <div class="value green" id="aiStatus">Monitoring</div>
-    </div>
+<div class="card">
+<div class="label">24h Change</div>
+<div class="value" id="change">Loading...</div>
+</div>
 
-  </div>
+</div>
 
-  <div class="panel">
+<div class="panel">
 
-    <h2>🤖 Trading Analysis Center</h2>
+<h2>🇨🇦 CAD Account</h2>
 
-    <div class="label">Choose trade horizon</div>
+<div class="bank-buttons">
+<button class="secondary" onclick="demoBankMessage('deposit')">
+Deposit CAD
+</button>
 
-    <select id="tradeHorizon">
-      <option value="1">1 Day</option>
-      <option value="2">2 Days</option>
-      <option value="3">3 Days</option>
-      <option value="4">4 Days</option>
-    </select>
+<button class="secondary" onclick="demoBankMessage('withdraw')">
+Withdraw CAD
+</button>
+</div>
 
-    <button class="scan" onclick="analyzeMarket()">
-      Analyze BTC/CAD
-    </button>
+<p class="small">
+Simulation only. A future production version would use a regulated
+Canadian financial provider for deposits, custody and withdrawals.
+Bank credentials should never be stored in this webpage.
+</p>
 
-    <div class="signal-box" id="signalBox">
-      Waiting for analysis...
-    </div>
+</div>
 
-  </div>
+<div class="panel">
 
-  <div class="panel">
+<h2>🤖 Market Analysis</h2>
 
-    <h2>📊 Market Metrics</h2>
+<div class="label">Trade horizon</div>
 
-    <div class="row">
-      <span>Current Price</span>
-      <strong id="metricPrice">-</strong>
-    </div>
+<select id="horizon">
+<option value="1">1 Day</option>
+<option value="2">2 Days</option>
+<option value="3">3 Days</option>
+<option value="4">4 Days</option>
+</select>
 
-    <div class="row">
-      <span>24h Change</span>
-      <strong id="metricChange">-</strong>
-    </div>
+<button class="scan" onclick="analyzeMarket()">
+Analyze BTC/CAD
+</button>
 
-    <div class="row">
-      <span>Trend</span>
-      <strong id="metricTrend">-</strong>
-    </div>
+<div id="analysis" class="signal-box">
+Waiting for analysis...
+</div>
 
-    <div class="row">
-      <span>Volatility</span>
-      <strong id="metricVolatility">-</strong>
-    </div>
+</div>
 
-  </div>
+<div class="panel">
 
-  <div class="panel">
+<h2>📊 Market Intelligence</h2>
 
-    <h2>🛡️ Risk Control</h2>
+<div class="row">
+<span>Current Price</span>
+<strong id="metricPrice">-</strong>
+</div>
 
-    <p>Paper portfolio: <strong>$10,000</strong></p>
-    <p>Maximum risk per trade: <strong>1%</strong></p>
-    <p>Maximum risk amount: <strong>$100</strong></p>
-    <p>Maximum daily loss: <strong>3%</strong></p>
-    <p>Live trading: <strong class="red">OFF</strong></p>
+<div class="row">
+<span>24h Momentum</span>
+<strong id="momentum">-</strong>
+</div>
 
-  </div>
+<div class="row">
+<span>Trend</span>
+<strong id="trend">-</strong>
+</div>
+
+<div class="row">
+<span>Volatility</span>
+<strong id="volatility">-</strong>
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>📈 Open Paper Trades</h2>
+
+<div id="openTrades">
+<p class="small">No open paper trades.</p>
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>🛡️ Risk Control</h2>
+
+<div class="row">
+<span>Risk per trade</span>
+<strong>1%</strong>
+</div>
+
+<div class="row">
+<span>Maximum daily loss</span>
+<strong>3%</strong>
+</div>
+
+<div class="row">
+<span>Maximum simultaneous trades</span>
+<strong>1</strong>
+</div>
+
+<div class="row">
+<span>Live Trading</span>
+<strong class="red">OFF</strong>
+</div>
+
+</div>
 
 </div>
 
 <footer>
-  Chinab's AI Trade Platform — Version 0.3
+Chinab's AI Trade Platform — Version 0.4
 </footer>
 
 <script>
 
-let marketData = null;
-
-const PAPER_PORTFOLIO = 10000;
+const STARTING_BALANCE = 10000;
 const RISK_PERCENT = 0.01;
 
-function formatCAD(number) {
-  return "$" + number.toLocaleString("en-CA", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  });
+let cash = STARTING_BALANCE;
+let marketData = null;
+let proposedTrade = null;
+let openTrade = null;
+
+function money(n){
+ return "$"+Number(n).toLocaleString("en-CA",{
+   minimumFractionDigits:2,
+   maximumFractionDigits:2
+ });
 }
 
-async function loadMarketData() {
+async function loadMarket(){
 
-  try {
+ try{
 
-    const url =
-      "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=cad&include_24hr_change=true";
+  const url =
+  "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=cad&include_24hr_change=true";
 
-    const response = await fetch(url);
+  const response = await fetch(url);
 
-    if (!response.ok) {
-      throw new Error("Market request failed");
-    }
+  if(!response.ok) throw new Error("Market data error");
 
-    const data = await response.json();
+  const data = await response.json();
 
-    marketData = {
-      price: data.bitcoin.cad,
-      change: data.bitcoin.cad_24h_change
-    };
+  marketData = {
+   price:data.bitcoin.cad,
+   change:data.bitcoin.cad_24h_change
+  };
 
-    document.getElementById("btcPrice").innerText =
-      formatCAD(marketData.price);
+  document.getElementById("btcPrice").innerText =
+   money(marketData.price);
 
-    const changeElement =
-      document.getElementById("change24h");
+  const changeElement =
+   document.getElementById("change");
 
-    changeElement.innerText =
-      marketData.change.toFixed(2) + "%";
+  changeElement.innerText =
+   marketData.change.toFixed(2)+"%";
 
-    changeElement.className =
-      "value " +
-      (marketData.change >= 0 ? "green" : "red");
+  changeElement.className =
+   "value "+(marketData.change>=0?"green":"red");
 
-    document.getElementById("metricPrice").innerText =
-      formatCAD(marketData.price);
+  updateMetrics();
+  updateTrade();
 
-    document.getElementById("metricChange").innerText =
-      marketData.change.toFixed(2) + "%";
+ }catch(error){
 
-    updateMetrics();
+  document.getElementById("btcPrice").innerText =
+   "Unavailable";
 
-  } catch (error) {
+ }
 
-    document.getElementById("btcPrice").innerText =
-      "Data unavailable";
+}
 
-    document.getElementById("change24h").innerText =
-      "-";
+function trendFromChange(change){
 
-    console.error(error);
+ if(change>=5) return "Strong Bullish";
+ if(change>=2) return "Bullish";
+ if(change<=-5) return "Strong Bearish";
+ if(change<=-2) return "Bearish";
+ return "Neutral";
 
+}
+
+function volatilityFromChange(change){
+
+ const x=Math.abs(change);
+
+ if(x>=8) return "Extreme";
+ if(x>=5) return "High";
+ if(x>=2) return "Medium";
+ return "Low";
+
+}
+
+function updateMetrics(){
+
+ if(!marketData) return;
+
+ document.getElementById("metricPrice").innerText =
+  money(marketData.price);
+
+ document.getElementById("momentum").innerText =
+  marketData.change.toFixed(2)+"%";
+
+ document.getElementById("trend").innerText =
+  trendFromChange(marketData.change);
+
+ document.getElementById("volatility").innerText =
+  volatilityFromChange(marketData.change);
+
+}
+
+function analyzeMarket(){
+
+ if(!marketData){
+  alert("Market data is still loading.");
+  return;
+ }
+
+ const price=marketData.price;
+ const change=marketData.change;
+ const horizon=Number(
+  document.getElementById("horizon").value
+ );
+
+ let signal="WAIT";
+ let color="yellow";
+ let confidence=50;
+ let reasons=[];
+
+ proposedTrade=null;
+
+ if(change>=2 && change<8){
+
+  signal="BUY";
+  color="green";
+
+  confidence=Math.min(
+   85,
+   Math.round(58+(change*3))
+  );
+
+  reasons.push("Positive BTC momentum detected.");
+  reasons.push("Price movement exceeds the bullish threshold.");
+
+ }else if(change<=-2 && change>-8){
+
+  signal="AVOID LONG";
+  color="red";
+
+  confidence=Math.min(
+   85,
+   Math.round(58+(Math.abs(change)*3))
+  );
+
+  reasons.push("Negative BTC momentum detected.");
+  reasons.push("The model avoids opening a long position.");
+
+ }else if(Math.abs(change)>=8){
+
+  signal="WAIT";
+  color="yellow";
+  confidence=72;
+
+  reasons.push("BTC is experiencing an unusually large 24-hour move.");
+  reasons.push("The model avoids chasing extreme volatility.");
+
+ }else{
+
+  signal="WAIT";
+  color="yellow";
+  confidence=60;
+
+  reasons.push("Momentum is currently inconclusive.");
+  reasons.push("No trade is preferable to forcing a weak setup.");
+
+ }
+
+ let tradeHTML="";
+
+ if(signal==="BUY"){
+
+  const stopPercent=0.03;
+  const stop=price*(1-stopPercent);
+
+  const targetPercent=
+   0.025+(horizon*0.01);
+
+  const target=
+   price*(1+targetPercent);
+
+  const maxRisk=
+   STARTING_BALANCE*RISK_PERCENT;
+
+  const riskPerBTC=
+   price-stop;
+
+  let quantity=
+   maxRisk/riskPerBTC;
+
+  let positionValue=
+   quantity*price;
+
+  if(positionValue>cash){
+   positionValue=cash;
+   quantity=positionValue/price;
   }
 
-}
+  proposedTrade={
+   entry:price,
+   stop:stop,
+   target:target,
+   quantity:quantity,
+   positionValue:positionValue,
+   horizon:horizon
+  };
 
-function getTrend(change) {
+  tradeHTML=`
 
-  if (change >= 3) return "Strong Bullish";
-  if (change >= 1) return "Bullish";
-  if (change <= -3) return "Strong Bearish";
-  if (change <= -1) return "Bearish";
+  <div class="row">
+  <span>Entry</span>
+  <strong>${money(price)}</strong>
+  </div>
 
-  return "Neutral";
-}
+  <div class="row">
+  <span>Stop Loss</span>
+  <strong class="red">${money(stop)}</strong>
+  </div>
 
-function getVolatility(change) {
+  <div class="row">
+  <span>Take Profit</span>
+  <strong class="green">${money(target)}</strong>
+  </div>
 
-  const amount = Math.abs(change);
+  <div class="row">
+  <span>Paper Position</span>
+  <strong>${money(positionValue)}</strong>
+  </div>
 
-  if (amount >= 6) return "Very High";
-  if (amount >= 4) return "High";
-  if (amount >= 2) return "Medium";
+  <button class="paper" onclick="openPaperTrade()">
+  Open Paper Trade
+  </button>
 
-  return "Low";
-}
-
-function updateMetrics() {
-
-  if (!marketData) return;
-
-  document.getElementById("metricTrend").innerText =
-    getTrend(marketData.change);
-
-  document.getElementById("metricVolatility").innerText =
-    getVolatility(marketData.change);
-
-}
-
-function analyzeMarket() {
-
-  if (!marketData) {
-    alert("Market data is still loading.");
-    return;
-  }
-
-  document.getElementById("aiStatus").innerText =
-    "Analyzing...";
-
-  const horizon =
-    Number(document.getElementById("tradeHorizon").value);
-
-  const price = marketData.price;
-  const change = marketData.change;
-
-  const volatility =
-    getVolatility(change);
-
-  let signal = "WAIT";
-  let signalClass = "yellow";
-
-  let stopLoss = null;
-  let takeProfit = null;
-  let positionSize = 0;
-  let btcQuantity = 0;
-
-  let reasons = [];
-
-  const maxRisk =
-    PAPER_PORTFOLIO * RISK_PERCENT;
-
-  if (
-    change >= 2 &&
-    Math.abs(change) < 8
-  ) {
-
-    signal = "BUY";
-    signalClass = "green";
-
-    const stopPercent =
-      volatility === "High" ? 0.035 : 0.03;
-
-    stopLoss =
-      price * (1 - stopPercent);
-
-    const targetPercent =
-      0.025 + (horizon * 0.01);
-
-    takeProfit =
-      price * (1 + targetPercent);
-
-    const riskPerBTC =
-      price - stopLoss;
-
-    btcQuantity =
-      maxRisk / riskPerBTC;
-
-    positionSize =
-      btcQuantity * price;
-
-    positionSize =
-      Math.min(positionSize, PAPER_PORTFOLIO);
-
-    btcQuantity =
-      positionSize / price;
-
-    reasons.push(
-      "BTC currently has positive momentum."
-    );
-
-    reasons.push(
-      "The 24-hour price change is above the bullish threshold."
-    );
-
-    reasons.push(
-      "Risk sizing limits the planned loss to approximately 1% of the paper portfolio."
-    );
-
-  } else if (
-    change <= -2 &&
-    Math.abs(change) < 8
-  ) {
-
-    signal = "SELL / STAY OUT";
-    signalClass = "red";
-
-    reasons.push(
-      "BTC currently has negative momentum."
-    );
-
-    reasons.push(
-      "The strategy avoids opening a long paper position during bearish conditions."
-    );
-
-  } else if (
-    Math.abs(change) >= 8
-  ) {
-
-    signal = "WAIT";
-    signalClass = "yellow";
-
-    reasons.push(
-      "Market movement is unusually large."
-    );
-
-    reasons.push(
-      "The strategy avoids chasing extremely volatile moves."
-    );
-
-  } else {
-
-    signal = "WAIT";
-    signalClass = "yellow";
-
-    reasons.push(
-      "Momentum is not strong enough to justify an entry."
-    );
-
-    reasons.push(
-      "Waiting can be preferable to forcing a trade."
-    );
-
-  }
-
-  let html = `
-    <h2 class="signal-title ${signalClass}">
-      ${signal}
-    </h2>
-
-    <div class="row">
-      <span>Holding Period</span>
-      <strong>
-        ${horizon} Day${horizon > 1 ? "s" : ""}
-      </strong>
-    </div>
-
-    <div class="row">
-      <span>Entry Reference</span>
-      <strong>${formatCAD(price)}</strong>
-    </div>
   `;
 
-  if (signal === "BUY") {
+ }
 
-    html += `
-      <div class="row">
-        <span>Paper Stop Loss</span>
-        <strong class="red">
-          ${formatCAD(stopLoss)}
-        </strong>
-      </div>
+ document.getElementById("analysis").innerHTML=`
 
-      <div class="row">
-        <span>Paper Take Profit</span>
-        <strong class="green">
-          ${formatCAD(takeProfit)}
-        </strong>
-      </div>
+ <h2 class="signal-title ${color}">
+ ${signal}
+ </h2>
 
-      <div class="row">
-        <span>Max Planned Risk</span>
-        <strong>
-          ${formatCAD(maxRisk)}
-        </strong>
-      </div>
+ <div class="row">
+ <span>Confidence</span>
+ <strong>${confidence}%</strong>
+ </div>
 
-      <div class="row">
-        <span>Paper Position Size</span>
-        <strong>
-          ${formatCAD(positionSize)}
-        </strong>
-      </div>
+ <div class="confidence">
+ <div class="confidence-fill"
+ style="width:${confidence}%"></div>
+ </div>
 
-      <div class="row">
-        <span>BTC Quantity</span>
-        <strong>
-          ${btcQuantity.toFixed(6)} BTC
-        </strong>
-      </div>
-    `;
-  }
+ <div class="row">
+ <span>Selected Horizon</span>
+ <strong>${horizon} Day${horizon>1?"s":""}</strong>
+ </div>
 
-  html += `
-    <h3>Why this signal?</h3>
+ ${tradeHTML}
 
-    <ul>
-      ${reasons.map(reason =>
-        `<li>${reason}</li>`
-      ).join("")}
-    </ul>
+ <h3>Why?</h3>
 
-    <p class="small">
-      This is a rule-based paper-trading model.
-      It is not true predictive AI and it cannot
-      guarantee future market direction or profit.
-    </p>
-  `;
+ <ul>
+ ${reasons.map(x=>"<li>"+x+"</li>").join("")}
+ </ul>
 
-  document.getElementById("signalBox").innerHTML =
-    html;
+ <p class="small">
+ The confidence score is a rule-based model score,
+ not a probability of profit. Version 0.4 does not
+ use machine learning and does not predict future prices.
+ </p>
 
-  document.getElementById("aiStatus").innerText =
-    "Monitoring";
+ `;
 
 }
 
-loadMarketData();
+function openPaperTrade(){
 
-setInterval(loadMarketData, 60000);
+ if(!proposedTrade){
+  alert("Analyze the market first.");
+  return;
+ }
+
+ if(openTrade){
+  alert("Only one paper trade can be open at a time.");
+  return;
+ }
+
+ openTrade={
+  ...proposedTrade,
+  opened:Date.now()
+ };
+
+ cash-=openTrade.positionValue;
+
+ proposedTrade=null;
+
+ updateTrade();
+ updateBalances();
+
+}
+
+function updateTrade(){
+
+ const area=document.getElementById("openTrades");
+
+ if(!openTrade || !marketData){
+  area.innerHTML=
+   '<p class="small">No open paper trades.</p>';
+  return;
+ }
+
+ const current=marketData.price;
+
+ const currentValue=
+  openTrade.quantity*current;
+
+ const pnl=
+  currentValue-openTrade.positionValue;
+
+ const pnlPercent=
+  (pnl/openTrade.positionValue)*100;
+
+ area.innerHTML=`
+
+ <div class="trade-card">
+
+ <div class="row">
+ <span>BTC Entry</span>
+ <strong>${money(openTrade.entry)}</strong>
+ </div>
+
+ <div class="row">
+ <span>Current BTC</span>
+ <strong>${money(current)}</strong>
+ </div>
+
+ <div class="row">
+ <span>Position</span>
+ <strong>${openTrade.quantity.toFixed(6)} BTC</strong>
+ </div>
+
+ <div class="row">
+ <span>Unrealized P&L</span>
+ <strong class="${pnl>=0?"green":"red"}">
+ ${money(pnl)} (${pnlPercent.toFixed(2)}%)
+ </strong>
+ </div>
+
+ <div class="row">
+ <span>Stop</span>
+ <strong class="red">${money(openTrade.stop)}</strong>
+ </div>
+
+ <div class="row">
+ <span>Target</span>
+ <strong class="green">${money(openTrade.target)}</strong>
+ </div>
+
+ <button class="secondary" onclick="closePaperTrade()">
+ Close Paper Trade
+ </button>
+
+ </div>
+
+ `;
+
+ if(current<=openTrade.stop){
+  closePaperTrade("Stop loss reached");
+ }
+
+ if(current>=openTrade.target){
+  closePaperTrade("Take profit reached");
+ }
+
+}
+
+function closePaperTrade(reason="Manual close"){
+
+ if(!openTrade || !marketData) return;
+
+ const finalValue=
+  openTrade.quantity*marketData.price;
+
+ cash+=finalValue;
+
+ const pnl=
+  finalValue-openTrade.positionValue;
+
+ alert(
+  reason+
+  "\\nPaper P&L: "+
+  money(pnl)
+ );
+
+ openTrade=null;
+
+ updateBalances();
+ updateTrade();
+
+}
+
+function updateBalances(){
+
+ let portfolio=cash;
+
+ if(openTrade && marketData){
+  portfolio+=
+   openTrade.quantity*marketData.price;
+ }
+
+ document.getElementById("cash").innerText=
+  money(cash);
+
+ document.getElementById("portfolio").innerText=
+  money(portfolio);
+
+}
+
+function demoBankMessage(type){
+
+ if(type==="deposit"){
+  alert(
+   "Demo only. No bank account is connected and no CAD will be deposited."
+  );
+ }else{
+  alert(
+   "Demo only. No bank account is connected and no CAD will be withdrawn."
+  );
+ }
+
+}
+
+loadMarket();
+
+setInterval(loadMarket,60000);
 
 </script>
 
