@@ -9,148 +9,222 @@
 name="viewport"
 content="width=device-width,initial-scale=1">
 
-<title>Chinab's AI Trade Platform v0.7</title>
+<title>Chinab's AI Trade Platform v0.9</title>
 
 <style>
 
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box
+}
 
 body{
-margin:0;
-font-family:Arial,sans-serif;
-background:#07111f;
-color:white
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#07111f;
+  color:white
 }
 
 header{
-padding:22px;
-background:#0d1b2a;
-border-bottom:1px solid #25354a
+  padding:22px;
+  background:#0d1b2a;
+  border-bottom:1px solid #25354a
 }
 
 header h1{
-margin:0;
-font-size:24px
+  margin:0;
+  font-size:24px
 }
 
 header p{
-color:#9fb0c5;
-margin-bottom:0
+  color:#9fb0c5;
+  margin-bottom:0
 }
 
 .container{
-padding:18px;
-max-width:1100px;
-margin:auto
+  padding:18px;
+  max-width:1100px;
+  margin:auto
 }
 
 .warning{
-background:#30260b;
-border:1px solid #7c6418;
-padding:14px;
-border-radius:14px;
-margin-bottom:18px
+  background:#30260b;
+  border:1px solid #7c6418;
+  padding:14px;
+  border-radius:14px;
+  margin-bottom:18px;
+  line-height:1.5
 }
 
 .grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
-gap:14px
+  display:grid;
+  grid-template-columns:
+  repeat(auto-fit,minmax(210px,1fr));
+  gap:14px
 }
 
-.card,.panel{
-background:#101d2d;
-border:1px solid #26384e;
-padding:18px;
-border-radius:16px
+.card,
+.panel{
+  background:#101d2d;
+  border:1px solid #26384e;
+  padding:18px;
+  border-radius:16px
 }
 
 .panel{
-margin-top:18px
+  margin-top:18px
 }
 
 .label{
-color:#94a7bd;
-font-size:14px
+  color:#94a7bd;
+  font-size:14px
 }
 
 .value{
-font-size:27px;
-font-weight:bold;
-margin-top:8px
+  font-size:27px;
+  font-weight:bold;
+  margin-top:8px
 }
 
-.green{color:#36d399}
-.red{color:#ff6b6b}
-.yellow{color:#f5c451}
-.blue{color:#60a5fa}
+.green{
+  color:#36d399
+}
+
+.red{
+  color:#ff6b6b
+}
+
+.yellow{
+  color:#f5c451
+}
+
+.blue{
+  color:#60a5fa
+}
 
 button{
-width:100%;
-padding:15px;
-margin-top:12px;
-border:0;
-border-radius:10px;
-font-size:16px;
-font-weight:bold;
-cursor:pointer
+  width:100%;
+  padding:15px;
+  margin-top:12px;
+  border:0;
+  border-radius:10px;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer
 }
 
 .primary{
-background:#3b82f6;
-color:white
+  background:#3b82f6;
+  color:white
 }
 
 .success{
-background:#16a36a;
-color:white
+  background:#16a36a;
+  color:white
 }
 
 .danger{
-background:#c84d4d;
-color:white
+  background:#c84d4d;
+  color:white
 }
 
 .secondary{
-background:#27384d;
-color:white
+  background:#27384d;
+  color:white
 }
 
 .row{
-display:flex;
-justify-content:space-between;
-gap:12px;
-padding:10px 0;
-border-bottom:1px solid #1e3045
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding:10px 0;
+  border-bottom:1px solid #1e3045;
+  align-items:center
 }
 
 .row:last-child{
-border-bottom:0
+  border-bottom:0
 }
 
-.signal-box,.trade-card{
-margin-top:14px;
-padding:15px;
-border-radius:12px;
-background:#0a1625;
-border:1px solid #2a3a50
+.row span{
+  flex:1
+}
+
+.row strong{
+  text-align:right;
+  max-width:55%
+}
+
+.signal-box,
+.trade-card{
+  margin-top:14px;
+  padding:15px;
+  border-radius:12px;
+  background:#0a1625;
+  border:1px solid #2a3a50
 }
 
 .small{
-color:#94a7bd;
-font-size:13px;
-line-height:1.5
+  color:#94a7bd;
+  font-size:13px;
+  line-height:1.5
 }
 
 .history-item{
-padding:12px 0;
-border-bottom:1px solid #1e3045
+  padding:12px 0;
+  border-bottom:1px solid #1e3045
+}
+
+.analysis-item{
+  padding:12px;
+  margin-top:10px;
+  border-radius:10px;
+  background:#0a1625;
+  border:1px solid #1e3045
+}
+
+.badge{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:bold
+}
+
+.badge-long{
+  background:#123c2e;
+  color:#36d399
+}
+
+.badge-short{
+  background:#452020;
+  color:#ff6b6b
+}
+
+.badge-wait{
+  background:#443710;
+  color:#f5c451
 }
 
 footer{
-text-align:center;
-color:#73869d;
-padding:30px
+  text-align:center;
+  color:#73869d;
+  padding:30px
+}
+
+@media(max-width:500px){
+
+  .row{
+    font-size:15px
+  }
+
+  .row strong{
+    max-width:58%
+  }
+
+  header h1{
+    font-size:23px
+  }
+
 }
 
 </style>
@@ -161,10 +235,12 @@ padding:30px
 
 <header>
 
-<h1>Chinab's AI Trade Platform</h1>
+<h1>
+Chinab's AI Trade Platform
+</h1>
 
 <p>
-24/7 server-side paper-testing engine — Version 0.7
+24/7 automated paper-testing & reporting engine — Version 0.9
 </p>
 
 </header>
@@ -172,194 +248,599 @@ padding:30px
 <div class="container">
 
 <div class="warning">
-🧪 PAPER TRADING ONLY — Railway performs simulated analysis in the background. No real money, leverage, bank account or exchange is connected.
+
+🧪 <strong>PAPER TRADING ONLY</strong> — This platform performs simulated trading and strategy testing. No real money, leverage, bank account or cryptocurrency exchange is connected.
+
 </div>
 
 <div class="grid">
 
 <div class="card">
-<div class="label">Paper Portfolio</div>
-<div class="value" id="portfolio">-</div>
+
+<div class="label">
+Paper Portfolio
+</div>
+
+<div
+class="value"
+id="portfolio">
+-
+</div>
+
 </div>
 
 <div class="card">
-<div class="label">Available CAD</div>
-<div class="value" id="cash">-</div>
+
+<div class="label">
+Available CAD
+</div>
+
+<div
+class="value"
+id="cash">
+-
+</div>
+
 </div>
 
 <div class="card">
-<div class="label">BTC / CAD</div>
-<div class="value" id="btcPrice">Loading...</div>
+
+<div class="label">
+BTC / CAD
+</div>
+
+<div
+class="value"
+id="btcPrice">
+Loading...
+</div>
+
 </div>
 
 <div class="card">
-<div class="label">Automation</div>
-<div class="value" id="automationStatus">-</div>
+
+<div class="label">
+Automation
+</div>
+
+<div
+class="value"
+id="automationStatus">
+-
+</div>
+
 </div>
 
 </div>
 
 <div class="panel">
 
-<h2>🤖 24/7 Auto Paper Trader</h2>
+<h2>
+🤖 24/7 Auto Paper Trader
+</h2>
 
 <button
 class="success"
 id="autoButton"
 onclick="toggleAutomation()">
+
 Loading...
+
 </button>
 
 <button
 class="primary"
 onclick="analyzeNow()">
+
 Analyze Now
+
 </button>
 
-<div id="analysis" class="signal-box">
+<div
+id="analysis"
+class="signal-box">
+
 Waiting for server analysis...
+
 </div>
 
 <div class="row">
-<span>Last Server Analysis</span>
-<strong id="lastAnalysis">-</strong>
-</div>
 
-<div class="row">
-<span>Server Heartbeat</span>
-<strong class="green" id="heartbeat">
-Checking...
+<span>
+Last Server Analysis
+</span>
+
+<strong
+id="lastAnalysis">
+-
 </strong>
+
+</div>
+
+<div class="row">
+
+<span>
+Last Market Update
+</span>
+
+<strong
+id="lastMarketUpdate">
+-
+</strong>
+
+</div>
+
+<div class="row">
+
+<span>
+Server Heartbeat
+</span>
+
+<strong
+class="green"
+id="heartbeat">
+
+Checking...
+
+</strong>
+
+</div>
+
+<div class="row">
+
+<span>
+Backend Engine
+</span>
+
+<strong
+id="backendVersion">
+
+-
+
+</strong>
+
 </div>
 
 <p class="small">
-The trading engine runs on Railway. Your iPhone does not need to remain unlocked and this webpage does not need to stay open.
+
+The paper-trading engine runs on Railway. The webpage does not need to remain open for automated testing to continue.
+
 </p>
 
 </div>
 
 <div class="panel">
 
-<h2>📊 Strategy Indicators</h2>
+<h2>
+📊 Strategy Indicators
+</h2>
 
 <div class="row">
-<span>24h Change</span>
-<strong id="change24">-</strong>
+
+<span>
+24h Change
+</span>
+
+<strong
+id="change24">
+-
+</strong>
+
 </div>
 
 <div class="row">
-<span>Short MA</span>
-<strong id="shortMA">-</strong>
+
+<span>
+Short MA
+</span>
+
+<strong
+id="shortMA">
+-
+</strong>
+
 </div>
 
 <div class="row">
-<span>Long MA</span>
-<strong id="longMA">-</strong>
+
+<span>
+Long MA
+</span>
+
+<strong
+id="longMA">
+-
+</strong>
+
 </div>
 
 <div class="row">
-<span>RSI-style Momentum</span>
-<strong id="rsi">-</strong>
+
+<span>
+RSI-style Momentum
+</span>
+
+<strong
+id="rsi">
+-
+</strong>
+
 </div>
 
 <div class="row">
-<span>Strategy Signal</span>
-<strong id="strategySignal">WAIT</strong>
+
+<span>
+Strategy Signal
+</span>
+
+<strong
+id="strategySignal">
+
+WAIT
+
+</strong>
+
 </div>
 
-<div id="rules" class="signal-box">
+<div
+id="rules"
+class="signal-box">
+
 Waiting for rule analysis...
+
 </div>
 
 </div>
 
 <div class="panel">
 
-<h2>📈 Open Paper Trade</h2>
+<h2>
+🧠 Analysis Statistics
+</h2>
 
-<div id="openTradeArea">
+<div class="row">
+
+<span>
+Analysis Cycles
+</span>
+
+<strong
+id="analysisCycles">
+0
+</strong>
+
+</div>
+
+<div class="row">
+
+<span>
+LONG Signals
+</span>
+
+<strong
+class="green"
+id="longSignals">
+0
+</strong>
+
+</div>
+
+<div class="row">
+
+<span>
+SHORT Signals
+</span>
+
+<strong
+class="red"
+id="shortSignals">
+0
+</strong>
+
+</div>
+
+<div class="row">
+
+<span>
+WAIT Signals
+</span>
+
+<strong
+class="yellow"
+id="waitSignals">
+0
+</strong>
+
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>
+📈 Open Paper Trade
+</h2>
+
+<div
+id="openTradeArea">
+
 <p class="small">
 No open paper trade.
 </p>
-</div>
 
-</div>
-
-<div class="panel">
-
-<h2>🏆 Performance Dashboard</h2>
-
-<div class="row">
-<span>Total Trades</span>
-<strong id="totalTrades">0</strong>
-</div>
-
-<div class="row">
-<span>Wins</span>
-<strong id="wins">0</strong>
-</div>
-
-<div class="row">
-<span>Losses</span>
-<strong id="losses">0</strong>
-</div>
-
-<div class="row">
-<span>Win Rate</span>
-<strong id="winRate">0%</strong>
-</div>
-
-<div class="row">
-<span>Realized P&amp;L</span>
-<strong id="realizedPnl">$0.00</strong>
-</div>
-
-<div class="row">
-<span>Maximum Drawdown</span>
-<strong id="maxDrawdown">0.00%</strong>
 </div>
 
 </div>
 
 <div class="panel">
 
-<h2>🧾 Trade History</h2>
+<h2>
+🏆 Performance Dashboard
+</h2>
+
+<div class="row">
+
+<span>
+Total Trades
+</span>
+
+<strong
+id="totalTrades">
+0
+</strong>
+
+</div>
+
+<div class="row">
+
+<span>
+Wins
+</span>
+
+<strong
+class="green"
+id="wins">
+0
+</strong>
+
+</div>
+
+<div class="row">
+
+<span>
+Losses
+</span>
+
+<strong
+class="red"
+id="losses">
+0
+</strong>
+
+</div>
+
+<div class="row">
+
+<span>
+Break Even
+</span>
+
+<strong
+id="breakEven">
+0
+</strong>
+
+</div>
+
+<div class="row">
+
+<span>
+Win Rate
+</span>
+
+<strong
+id="winRate">
+0%
+</strong>
+
+</div>
+
+<div class="row">
+
+<span>
+Realized P&amp;L
+</span>
+
+<strong
+id="realizedPnl">
+
+$0.00
+
+</strong>
+
+</div>
+
+<div class="row">
+
+<span>
+Average P&amp;L / Trade
+</span>
+
+<strong
+id="averagePnl">
+
+$0.00
+
+</strong>
+
+</div>
+
+<div class="row">
+
+<span>
+Gross Profit
+</span>
+
+<strong
+class="green"
+id="grossProfit">
+
+$0.00
+
+</strong>
+
+</div>
+
+<div class="row">
+
+<span>
+Gross Loss
+</span>
+
+<strong
+class="red"
+id="grossLoss">
+
+$0.00
+
+</strong>
+
+</div>
+
+<div class="row">
+
+<span>
+Profit Factor
+</span>
+
+<strong
+id="profitFactor">
+
+0.00
+
+</strong>
+
+</div>
+
+<div class="row">
+
+<span>
+Maximum Drawdown
+</span>
+
+<strong
+id="maxDrawdown">
+
+0.00%
+
+</strong>
+
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>
+🧾 Trade History
+</h2>
 
 <div id="history">
+
 <p class="small">
 No completed trades yet.
 </p>
+
 </div>
 
 </div>
 
 <div class="panel">
 
-<h2>🛡️ Safety Rules</h2>
+<h2>
+🔬 Recent Analysis History
+</h2>
+
+<p class="small">
+
+This records recent strategy checks so we can evaluate how often the engine chooses LONG, SHORT or WAIT.
+
+</p>
+
+<div id="analysisHistory">
+
+<p class="small">
+No recorded analysis cycles yet.
+</p>
+
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>
+🛡️ Safety Rules
+</h2>
 
 <div class="row">
-<span>Risk per trade</span>
-<strong>0.75%</strong>
+
+<span>
+Risk per trade
+</span>
+
+<strong>
+0.75%
+</strong>
+
 </div>
 
 <div class="row">
-<span>Maximum simultaneous trades</span>
-<strong>1</strong>
+
+<span>
+Maximum simultaneous trades
+</span>
+
+<strong>
+1
+</strong>
+
 </div>
 
 <div class="row">
-<span>Extreme-volatility filter</span>
-<strong class="green">ON</strong>
+
+<span>
+Extreme-volatility filter
+</span>
+
+<strong class="green">
+ON
+</strong>
+
 </div>
 
 <div class="row">
-<span>Leverage</span>
-<strong class="green">OFF</strong>
+
+<span>
+Leverage
+</span>
+
+<strong class="green">
+OFF
+</strong>
+
 </div>
 
 <div class="row">
-<span>Live trading</span>
-<strong class="red">OFF</strong>
+
+<span>
+Live trading
+</span>
+
+<strong class="red">
+OFF
+</strong>
+
 </div>
 
 </div>
@@ -367,7 +848,13 @@ No completed trades yet.
 </div>
 
 <footer>
-Chinab's AI Trade Platform — Version 0.7
+
+Chinab's AI Trade Platform — Version 0.9<br><br>
+
+<span class="small">
+Experimental paper-testing software. Past simulated performance does not guarantee future results.
+</span>
+
 </footer>
 
 <script>
@@ -376,496 +863,952 @@ let latest = null;
 
 function money(n){
 
-return "$" +
-Number(n || 0).toLocaleString(
-"en-CA",
-{
-minimumFractionDigits:2,
-maximumFractionDigits:2
+  return "$" +
+  Number(
+    n || 0
+  ).toLocaleString(
+    "en-CA",
+    {
+      minimumFractionDigits:2,
+      maximumFractionDigits:2
+    }
+  );
 }
-);
 
+function percent(n){
+
+  return Number(
+    n || 0
+  ).toFixed(2) + "%";
 }
 
 function timeText(ts){
 
-if(!ts)
-return "Not yet";
+  if(!ts)
+    return "Not yet";
 
-return new Date(ts).toLocaleString();
-
+  return new Date(
+    ts
+  ).toLocaleString();
 }
 
-async function api(url,method="GET"){
+async function api(
+  url,
+  method="GET"
+){
 
-const res =
-await fetch(
-url,
-{
-method,
-headers:{
-"Content-Type":"application/json"
-}
-}
-);
+  const res =
+    await fetch(
+      url,
+      {
+        method,
 
-if(!res.ok)
-throw new Error("Server request failed");
+        headers:{
+          "Content-Type":
+          "application/json"
+        }
+      }
+    );
 
-return res.json();
+  if(!res.ok)
+    throw new Error(
+      "Server request failed"
+    );
 
+  return res.json();
 }
 
 async function refresh(){
 
-try{
+  try{
 
-latest =
-await api("/api/state");
+    latest =
+      await api(
+        "/api/state"
+      );
 
-render();
+    render();
 
-document
-.getElementById("heartbeat")
-.innerText =
-"● SERVER ONLINE";
+    document
+    .getElementById(
+      "heartbeat"
+    )
+    .innerText =
+      "● SERVER ONLINE";
 
-document
-.getElementById("heartbeat")
-.className =
-"green";
+    document
+    .getElementById(
+      "heartbeat"
+    )
+    .className =
+      "green";
 
-}catch(err){
+  }catch(err){
 
-document
-.getElementById("heartbeat")
-.innerText =
-"SERVER UNAVAILABLE";
+    document
+    .getElementById(
+      "heartbeat"
+    )
+    .innerText =
+      "SERVER UNAVAILABLE";
 
-document
-.getElementById("heartbeat")
-.className =
-"red";
-
-}
-
+    document
+    .getElementById(
+      "heartbeat"
+    )
+    .className =
+      "red";
+  }
 }
 
 function render(){
 
-const d = latest;
+  const d =
+    latest;
 
-if(!d)
-return;
+  if(!d)
+    return;
 
-document
-.getElementById("portfolio")
-.innerText =
-money(d.portfolio);
+  document
+  .getElementById(
+    "portfolio"
+  )
+  .innerText =
+    money(
+      d.portfolio
+    );
 
-document
-.getElementById("cash")
-.innerText =
-money(d.cash);
+  document
+  .getElementById(
+    "cash"
+  )
+  .innerText =
+    money(
+      d.cash
+    );
 
-document
-.getElementById("btcPrice")
-.innerText =
-d.market
-? money(d.market.price)
-: "Unavailable";
+  document
+  .getElementById(
+    "btcPrice"
+  )
+  .innerText =
+    d.market
+      ? money(
+          d.market.price
+        )
+      : "Unavailable";
 
-const status =
-document.getElementById("automationStatus");
+  document
+  .getElementById(
+    "backendVersion"
+  )
+  .innerText =
+    d.version
+      ? "v" + d.version
+      : "-";
 
-const button =
-document.getElementById("autoButton");
+  const status =
+    document
+    .getElementById(
+      "automationStatus"
+    );
 
-if(d.automation){
+  const button =
+    document
+    .getElementById(
+      "autoButton"
+    );
 
-status.innerHTML =
-'<span class="green">ON</span>';
+  if(d.automation){
 
-button.innerText =
-"Stop Automated Paper Testing";
+    status.innerHTML =
+      '<span class="green">ON</span>';
 
-button.className =
-"danger";
+    button.innerText =
+      "Stop Automated Paper Testing";
 
-}else{
+    button.className =
+      "danger";
 
-status.innerText =
-"OFF";
+  }else{
 
-button.innerText =
-"Start 24/7 Automated Paper Testing";
+    status.innerText =
+      "OFF";
 
-button.className =
-"success";
+    button.innerText =
+      "Start 24/7 Automated Paper Testing";
 
+    button.className =
+      "success";
+  }
+
+  document
+  .getElementById(
+    "lastAnalysis"
+  )
+  .innerText =
+    timeText(
+      d.lastAnalysis
+    );
+
+  document
+  .getElementById(
+    "lastMarketUpdate"
+  )
+  .innerText =
+    timeText(
+      d.lastMarketUpdate
+    );
+
+  if(d.market){
+
+    document
+    .getElementById(
+      "change24"
+    )
+    .innerText =
+      percent(
+        d.market.change
+      );
+  }
+
+  if(d.indicators){
+
+    document
+    .getElementById(
+      "shortMA"
+    )
+    .innerText =
+      money(
+        d.indicators.shortMA
+      );
+
+    document
+    .getElementById(
+      "longMA"
+    )
+    .innerText =
+      money(
+        d.indicators.longMA
+      );
+
+    document
+    .getElementById(
+      "rsi"
+    )
+    .innerText =
+      Number(
+        d.indicators.rsi
+      ).toFixed(1);
+  }
+
+  renderDecision(
+    d.decision
+  );
+
+  renderTrade(
+    d.openTrade
+  );
+
+  renderPerformance(
+    d
+  );
+
+  renderSignalStats(
+    d
+  );
+
+  renderHistory(
+    d.history || []
+  );
+
+  renderAnalysisHistory(
+    d.analysisHistory || []
+  );
 }
 
-document
-.getElementById("lastAnalysis")
-.innerText =
-timeText(d.lastAnalysis);
+function renderDecision(
+  decision
+){
 
-if(d.market){
+  if(!decision)
+    return;
 
-document
-.getElementById("change24")
-.innerText =
-Number(d.market.change).toFixed(2) + "%";
+  const signal =
+    decision.signal;
 
+  const color =
+    signal === "LONG"
+      ? "green"
+      : signal === "SHORT"
+      ? "red"
+      : "yellow";
+
+  const signalEl =
+    document
+    .getElementById(
+      "strategySignal"
+    );
+
+  signalEl.innerText =
+    signal;
+
+  signalEl.className =
+    color;
+
+  document
+  .getElementById(
+    "analysis"
+  )
+  .innerHTML = `
+
+    <h2 class="${color}">
+      ${signal}
+    </h2>
+
+    <div class="row">
+
+      <span>
+        Rule Agreement
+      </span>
+
+      <strong>
+        ${decision.score}/5
+      </strong>
+
+    </div>
+
+    <p>
+      ${decision.reason}
+    </p>
+
+    <p class="small">
+
+      Experimental paper-trading logic.
+      Rule agreement is not a probability of profit.
+
+    </p>
+  `;
+
+  const rules =
+    decision.rules || [];
+
+  document
+  .getElementById(
+    "rules"
+  )
+  .innerHTML =
+    rules.length
+
+    ? rules.map(
+        r => `
+
+        <div class="row">
+
+          <span>
+            ${r.passed ? "✅" : "❌"}
+            ${r.name}
+          </span>
+
+          <strong>
+            ${r.detail}
+          </strong>
+
+        </div>
+
+        `
+      ).join("")
+
+    : "No rule data yet.";
 }
 
-if(d.indicators){
+function renderTrade(
+  trade
+){
 
-document
-.getElementById("shortMA")
-.innerText =
-money(d.indicators.shortMA);
+  const area =
+    document
+    .getElementById(
+      "openTradeArea"
+    );
 
-document
-.getElementById("longMA")
-.innerText =
-money(d.indicators.longMA);
+  if(!trade){
 
-document
-.getElementById("rsi")
-.innerText =
-Number(d.indicators.rsi).toFixed(1);
+    area.innerHTML =
+      '<p class="small">No open paper trade.</p>';
 
+    return;
+  }
+
+  area.innerHTML = `
+
+    <div class="trade-card">
+
+      <div class="row">
+
+        <span>
+          Side
+        </span>
+
+        <strong class="${
+          trade.side === "LONG"
+          ? "green"
+          : "red"
+        }">
+
+          ${trade.side}
+
+        </strong>
+
+      </div>
+
+      <div class="row">
+
+        <span>
+          Entry
+        </span>
+
+        <strong>
+          ${money(
+            trade.entry
+          )}
+        </strong>
+
+      </div>
+
+      <div class="row">
+
+        <span>
+          Position
+        </span>
+
+        <strong>
+
+          ${
+            Number(
+              trade.quantity
+            ).toFixed(6)
+          } BTC
+
+        </strong>
+
+      </div>
+
+      <div class="row">
+
+        <span>
+          Position Value
+        </span>
+
+        <strong>
+
+          ${money(
+            trade.positionValue
+          )}
+
+        </strong>
+
+      </div>
+
+      <div class="row">
+
+        <span>
+          Current P&amp;L
+        </span>
+
+        <strong class="${
+          trade.currentPnl >= 0
+          ? "green"
+          : "red"
+        }">
+
+          ${money(
+            trade.currentPnl
+          )}
+
+        </strong>
+
+      </div>
+
+      <div class="row">
+
+        <span>
+          Stop
+        </span>
+
+        <strong class="red">
+
+          ${money(
+            trade.stop
+          )}
+
+        </strong>
+
+      </div>
+
+      <div class="row">
+
+        <span>
+          Target
+        </span>
+
+        <strong class="green">
+
+          ${money(
+            trade.target
+          )}
+
+        </strong>
+
+      </div>
+
+      <div class="row">
+
+        <span>
+          Opened
+        </span>
+
+        <strong>
+
+          ${timeText(
+            trade.openedAt
+          )}
+
+        </strong>
+
+      </div>
+
+      <button
+      class="secondary"
+      onclick="closeTrade()">
+
+        Close Paper Trade
+
+      </button>
+
+    </div>
+  `;
 }
 
-renderDecision(d.decision);
-renderTrade(d.openTrade);
-renderPerformance(d);
-renderHistory(d.history || []);
+function renderPerformance(
+  d
+){
 
+  const p =
+    d.performance;
+
+  if(!p)
+    return;
+
+  document
+  .getElementById(
+    "totalTrades"
+  )
+  .innerText =
+    p.total || 0;
+
+  document
+  .getElementById(
+    "wins"
+  )
+  .innerText =
+    p.wins || 0;
+
+  document
+  .getElementById(
+    "losses"
+  )
+  .innerText =
+    p.losses || 0;
+
+  document
+  .getElementById(
+    "breakEven"
+  )
+  .innerText =
+    p.breakEven || 0;
+
+  document
+  .getElementById(
+    "winRate"
+  )
+  .innerText =
+    Number(
+      p.winRate || 0
+    ).toFixed(1)
+    + "%";
+
+  document
+  .getElementById(
+    "realizedPnl"
+  )
+  .innerText =
+    money(
+      p.realizedPnl
+    );
+
+  document
+  .getElementById(
+    "averagePnl"
+  )
+  .innerText =
+    money(
+      p.averagePnl
+    );
+
+  document
+  .getElementById(
+    "grossProfit"
+  )
+  .innerText =
+    money(
+      p.grossProfit
+    );
+
+  document
+  .getElementById(
+    "grossLoss"
+  )
+  .innerText =
+    money(
+      p.grossLoss
+    );
+
+  const pf =
+    p.profitFactor;
+
+  document
+  .getElementById(
+    "profitFactor"
+  )
+  .innerText =
+    pf === null
+      ? "∞"
+      : Number(
+          pf || 0
+        ).toFixed(2);
+
+  document
+  .getElementById(
+    "maxDrawdown"
+  )
+  .innerText =
+    Number(
+      d.maxDrawdown || 0
+    ).toFixed(2)
+    + "%";
 }
 
-function renderDecision(decision){
+function renderSignalStats(
+  d
+){
 
-if(!decision)
-return;
+  const stats =
+    d.signalStats || {};
 
-const signal =
-decision.signal;
+  document
+  .getElementById(
+    "analysisCycles"
+  )
+  .innerText =
+    d.analysisCycles || 0;
 
-const color =
-signal === "LONG"
-? "green"
-: signal === "SHORT"
-? "red"
-: "yellow";
+  document
+  .getElementById(
+    "longSignals"
+  )
+  .innerText =
+    stats.long || 0;
 
-const signalEl =
-document.getElementById("strategySignal");
+  document
+  .getElementById(
+    "shortSignals"
+  )
+  .innerText =
+    stats.short || 0;
 
-signalEl.innerText =
-signal;
-
-signalEl.className =
-color;
-
-document
-.getElementById("analysis")
-.innerHTML = `
-
-<h2 class="${color}">
-${signal}
-</h2>
-
-<div class="row">
-<span>Rule Agreement</span>
-<strong>${decision.score}/5</strong>
-</div>
-
-<p>${decision.reason}</p>
-
-<p class="small">
-Experimental paper-trading logic. Rule agreement is not a probability of profit.
-</p>
-
-`;
-
-const rules =
-decision.rules || [];
-
-document
-.getElementById("rules")
-.innerHTML =
-rules.length
-? rules.map(
-r => `
-
-<div class="row">
-
-<span>
-${r.passed ? "✅" : "❌"}
-${r.name}
-</span>
-
-<strong>
-${r.detail}
-</strong>
-
-</div>
-
-`
-).join("")
-: "No rule data yet.";
-
+  document
+  .getElementById(
+    "waitSignals"
+  )
+  .innerText =
+    stats.wait || 0;
 }
 
-function renderTrade(trade){
+function renderHistory(
+  history
+){
 
-const area =
-document.getElementById("openTradeArea");
+  const area =
+    document
+    .getElementById(
+      "history"
+    );
 
-if(!trade){
+  if(!history.length){
 
-area.innerHTML =
-'<p class="small">No open paper trade.</p>';
+    area.innerHTML =
+      '<p class="small">No completed trades yet.</p>';
 
-return;
+    return;
+  }
 
+  area.innerHTML =
+    history.map(
+      t => `
+
+      <div class="history-item">
+
+        <div class="row">
+
+          <span>
+            ${t.side}
+          </span>
+
+          <strong class="${
+            t.pnl >= 0
+            ? "green"
+            : "red"
+          }">
+
+            ${money(
+              t.pnl
+            )}
+
+          </strong>
+
+        </div>
+
+        <div class="small">
+
+          Entry:
+          ${money(
+            t.entry
+          )}
+
+          <br>
+
+          Exit:
+          ${money(
+            t.exit
+          )}
+
+          <br>
+
+          Return:
+          ${
+            Number(
+              t.returnPercent || 0
+            ).toFixed(2)
+          }%
+
+          <br>
+
+          Reason:
+          ${t.reason}
+
+          <br>
+
+          Closed:
+          ${timeText(
+            t.closedAt
+          )}
+
+        </div>
+
+      </div>
+
+      `
+    ).join("");
 }
 
-area.innerHTML = `
+function renderAnalysisHistory(
+  history
+){
 
-<div class="trade-card">
+  const area =
+    document
+    .getElementById(
+      "analysisHistory"
+    );
 
-<div class="row">
-<span>Side</span>
-<strong class="${
-trade.side === "LONG"
-? "green"
-: "red"
-}">
-${trade.side}
-</strong>
-</div>
+  if(!history.length){
 
-<div class="row">
-<span>Entry</span>
-<strong>${money(trade.entry)}</strong>
-</div>
+    area.innerHTML =
+      '<p class="small">No recorded analysis cycles yet.</p>';
 
-<div class="row">
-<span>Position</span>
-<strong>
-${Number(trade.quantity).toFixed(6)} BTC
-</strong>
-</div>
+    return;
+  }
 
-<div class="row">
-<span>P&amp;L</span>
-<strong class="${
-trade.currentPnl >= 0
-? "green"
-: "red"
-}">
-${money(trade.currentPnl)}
-</strong>
-</div>
+  area.innerHTML =
+    history
+    .slice(
+      0,
+      20
+    )
+    .map(
+      item => {
 
-<div class="row">
-<span>Stop</span>
-<strong class="red">
-${money(trade.stop)}
-</strong>
-</div>
+        const badgeClass =
+          item.signal === "LONG"
+          ? "badge-long"
+          : item.signal === "SHORT"
+          ? "badge-short"
+          : "badge-wait";
 
-<div class="row">
-<span>Target</span>
-<strong class="green">
-${money(trade.target)}
-</strong>
-</div>
+        return `
 
-<button
-class="secondary"
-onclick="closeTrade()">
-Close Paper Trade
-</button>
+        <div class="analysis-item">
 
-</div>
+          <div class="row">
 
-`;
+            <span>
 
-}
+              <span class="badge ${badgeClass}">
 
-function renderPerformance(d){
+                ${item.signal}
 
-const p = d.performance;
+              </span>
 
-if(!p)
-return;
+            </span>
 
-document
-.getElementById("totalTrades")
-.innerText =
-p.total;
+            <strong>
 
-document
-.getElementById("wins")
-.innerText =
-p.wins;
+              ${money(
+                item.price
+              )}
 
-document
-.getElementById("losses")
-.innerText =
-p.losses;
+            </strong>
 
-document
-.getElementById("winRate")
-.innerText =
-Number(p.winRate).toFixed(1) + "%";
+          </div>
 
-document
-.getElementById("realizedPnl")
-.innerText =
-money(p.realizedPnl);
+          <div class="small">
 
-document
-.getElementById("maxDrawdown")
-.innerText =
-Number(d.maxDrawdown || 0).toFixed(2) + "%";
+            ${timeText(
+              item.time
+            )}
 
-}
+            <br>
 
-function renderHistory(history){
+            Source:
+            ${item.source || "automatic"}
 
-const area =
-document.getElementById("history");
+            <br>
 
-if(!history.length){
+            Rule score:
+            ${item.score}/5
 
-area.innerHTML =
-'<p class="small">No completed trades yet.</p>';
+            <br>
 
-return;
+            24h:
+            ${
+              Number(
+                item.change24 || 0
+              ).toFixed(2)
+            }%
 
-}
+            <br>
 
-area.innerHTML =
-history.map(
-t => `
+            RSI:
+            ${
+              item.rsi !== null
+              ? Number(
+                  item.rsi
+                ).toFixed(1)
+              : "-"
+            }
 
-<div class="history-item">
+            <br>
 
-<div class="row">
+            Portfolio:
+            ${money(
+              item.portfolio
+            )}
 
-<span>${t.side}</span>
+            <br>
 
-<strong class="${
-t.pnl >= 0
-? "green"
-: "red"
-}">
-${money(t.pnl)}
-</strong>
+            ${item.reason}
 
-</div>
+          </div>
 
-<div class="small">
+        </div>
 
-${money(t.entry)}
-→
-${money(t.exit)}
-
-<br>
-
-${t.reason}
-
-<br>
-
-${timeText(t.closedAt)}
-
-</div>
-
-</div>
-
-`
-).join("");
-
+        `;
+      }
+    )
+    .join("");
 }
 
 async function toggleAutomation(){
 
-if(!latest)
-return;
+  if(!latest)
+    return;
 
-try{
+  try{
 
-const endpoint =
-latest.automation
-? "/api/stop"
-: "/api/start";
+    const endpoint =
+      latest.automation
+      ? "/api/stop"
+      : "/api/start";
 
-await api(endpoint,"POST");
+    await api(
+      endpoint,
+      "POST"
+    );
 
-await refresh();
+    await refresh();
 
-}catch(err){
+  }catch(err){
 
-alert(
-"Could not change automation status."
-);
-
-}
-
+    alert(
+      "Could not change automation status."
+    );
+  }
 }
 
 async function analyzeNow(){
 
-try{
+  try{
 
-await api(
-"/api/analyze",
-"POST"
-);
+    await api(
+      "/api/analyze",
+      "POST"
+    );
 
-await refresh();
+    await refresh();
 
-}catch(err){
+  }catch(err){
 
-alert(
-"Analysis request failed."
-);
-
-}
-
+    alert(
+      "Analysis request failed."
+    );
+  }
 }
 
 async function closeTrade(){
 
-try{
+  try{
 
-await api(
-"/api/close",
-"POST"
-);
+    await api(
+      "/api/close",
+      "POST"
+    );
 
-await refresh();
+    await refresh();
 
-}catch(err){
+  }catch(err){
 
-alert(
-"Could not close paper trade."
-);
-
-}
-
+    alert(
+      "Could not close paper trade."
+    );
+  }
 }
 
 refresh();
 
 setInterval(
-refresh,
-10000
+  refresh,
+  10000
 );
 
 </script>
