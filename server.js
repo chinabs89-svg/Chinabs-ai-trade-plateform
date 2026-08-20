@@ -6,7 +6,9 @@ const PORT = process.env.PORT || 3000;
 
 const STARTING_BALANCE = 10000;
 const RISK_PERCENT = 0.0075;
+const MAX_ANALYSIS_HISTORY = 500;
 
+// Keep the existing filename so v0.8 can reuse v0.7 state.
 const STATE_FILE =
   process.env.STATE_FILE ||
   "/data/chinab-v07-state.json";
@@ -15,108 +17,198 @@ let market = null;
 let priceHistory = [];
 
 let state = {
+  schemaVersion: 8,
+
   cash: STARTING_BALANCE,
   openTrade: null,
   history: [],
+
   automation: false,
+
   peakPortfolio: STARTING_BALANCE,
   maxDrawdown: 0,
+
   lastAnalysis: null,
   lastMarketUpdate: null,
   lastSignal: "WAIT",
   lastDecision: null,
+
+  analysisHistory: [],
+  analysisCycles: 0,
+
   startedAt: Date.now()
 };
 
 function loadState() {
   try {
-    if (fs.existsSync(STATE_FILE)) {
-      const saved =
-        JSON.parse(fs.readFileSync(STATE_FILE, "utf8"));
 
-      state = {
-        ...state,
-        ...saved
-      };
-    }
+    if (!fs.existsSync(STATE_FILE))
+      return;
+
+    const saved =
+      JSON.parse(
+        fs.readFileSync(
+          STATE_FILE,
+          "utf8"
+        )
+      );
+
+    state = {
+      ...state,
+      ...saved,
+
+      history:
+        Array.isArray(saved.history)
+          ? saved.history
+          : [],
+
+      analysisHistory:
+        Array.isArray(saved.analysisHistory)
+          ? saved.analysisHistory
+          : []
+    };
+
+    state.schemaVersion = 8;
+
+    console.log(
+      "Existing paper state loaded."
+    );
+
   } catch (err) {
-    console.error("Could not load saved state:", err.message);
+
+    console.error(
+      "Could not load saved state:",
+      err.message
+    );
   }
 }
 
 function saveState() {
   try {
-    const dir = path.dirname(STATE_FILE);
+
+    const dir =
+      path.dirname(
+        STATE_FILE
+      );
 
     if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+      fs.mkdirSync(
+        dir,
+        {
+          recursive: true
+        }
+      );
     }
 
     fs.writeFileSync(
       STATE_FILE,
-      JSON.stringify(state, null, 2)
+      JSON.stringify(
+        state,
+        null,
+        2
+      )
     );
+
   } catch (err) {
-    console.error("Could not save state:", err.message);
+
+    console.error(
+      "Could not save state:",
+      err.message
+    );
   }
 }
 
 function average(arr) {
-  if (!arr.length) return 0;
+
+  if (!arr.length)
+    return 0;
 
   return (
-    arr.reduce((a, b) => a + b, 0) /
+    arr.reduce(
+      (a, b) => a + b,
+      0
+    ) /
     arr.length
   );
 }
 
-function calculateRSI(prices, period = 14) {
+function calculateRSI(
+  prices,
+  period = 14
+) {
 
-  if (prices.length < period + 1)
+  if (
+    prices.length <
+    period + 1
+  )
     return 50;
 
   const recent =
-    prices.slice(-(period + 1));
+    prices.slice(
+      -(period + 1)
+    );
 
   let gains = 0;
   let losses = 0;
 
-  for (let i = 1; i < recent.length; i++) {
+  for (
+    let i = 1;
+    i < recent.length;
+    i++
+  ) {
 
     const diff =
-      recent[i] - recent[i - 1];
+      recent[i] -
+      recent[i - 1];
 
     if (diff > 0)
       gains += diff;
     else
-      losses += Math.abs(diff);
+      losses +=
+        Math.abs(diff);
   }
 
   if (losses === 0)
     return 100;
 
-  const rs =
-    (gains / period) /
-    (losses / period);
+  const avgGain =
+    gains / period;
 
-  return 100 -
-    (100 / (1 + rs));
+  const avgLoss =
+    losses / period;
+
+  const rs =
+    avgGain / avgLoss;
+
+  return (
+    100 -
+    100 / (1 + rs)
+  );
 }
 
 function getIndicators() {
 
-  if (!market ||
-      priceHistory.length < 36)
+  if (
+    !market ||
+    priceHistory.length < 36
+  )
     return null;
 
   const shortMA =
-    average(priceHistory.slice(-12));
+    average(
+      priceHistory.slice(-12)
+    );
 
   const longMA =
-    average(priceHistory.slice(-36));
+    average(
+      priceHistory.slice(-36)
+    );
 
   const rsi =
-    calculateRSI(priceHistory, 14);
+    calculateRSI(
+      priceHistory,
+      14
+    );
 
   return {
     shortMA,
@@ -135,30 +227,64 @@ function determineSignal() {
     return {
       signal: "WAIT",
       score: 0,
-      reason: "Insufficient historical data.",
+      reason:
+        "Insufficient historical data.",
       rules: []
     };
   }
 
   const change =
-    market.change;
+    Number(
+      market.change || 0
+    );
 
   const rules = [];
 
-  if (Math.abs(change) >= 8) {
+  if (
+    Math.abs(change) >= 8
+  ) {
 
     return {
       signal: "WAIT",
       score: 0,
+
       reason:
         "Extreme 24-hour volatility filter is active.",
+
       rules: [
+        {
+          name: "Trend",
+          passed: false,
+          detail:
+            "Trade evaluation blocked"
+        },
+        {
+          name: "Momentum",
+          passed: false,
+          detail:
+            "Trade evaluation blocked"
+        },
+        {
+          name: "24h Direction",
+          passed: false,
+          detail:
+            change.toFixed(2) +
+            "%"
+        },
         {
           name: "Volatility",
           passed: false,
           detail:
-            Math.abs(change).toFixed(2) +
+            Math.abs(change)
+              .toFixed(2) +
             "% exceeds safety limit"
+        },
+        {
+          name:
+            "Entry Confirmation",
+          passed: false,
+          detail:
+            "Blocked by volatility filter"
         }
       ]
     };
@@ -171,18 +297,20 @@ function determineSignal() {
     ind.shortMA >
     ind.longMA;
 
-  rules.push({
-    name: "Trend",
-    passed: bullishTrend,
-    detail: bullishTrend
-      ? "Short MA above Long MA"
-      : "Short MA below Long MA"
-  });
-
   if (bullishTrend)
     longScore += 2;
   else
     shortScore += 2;
+
+  rules.push({
+    name: "Trend",
+    passed: true,
+
+    detail:
+      bullishTrend
+        ? "Short MA above Long MA"
+        : "Short MA below Long MA"
+  });
 
   const longMomentum =
     ind.rsi >= 52 &&
@@ -192,31 +320,26 @@ function determineSignal() {
     ind.rsi <= 48 &&
     ind.rsi >= 30;
 
-  rules.push({
-    name: "Momentum",
-    passed:
-      longMomentum ||
-      shortMomentum,
-    detail:
-      "RSI-style momentum " +
-      ind.rsi.toFixed(1)
-  });
-
   if (longMomentum)
     longScore += 2;
 
   if (shortMomentum)
     shortScore += 2;
 
+  rules.push({
+    name: "Momentum",
+
+    passed:
+      longMomentum ||
+      shortMomentum,
+
+    detail:
+      "RSI-style momentum " +
+      ind.rsi.toFixed(1)
+  });
+
   const positiveChange =
     change > 0;
-
-  rules.push({
-    name: "24h Direction",
-    passed: true,
-    detail:
-      change.toFixed(2) + "%"
-  });
 
   if (positiveChange)
     longScore += 1;
@@ -224,44 +347,64 @@ function determineSignal() {
     shortScore += 1;
 
   rules.push({
+    name: "24h Direction",
+    passed: true,
+    detail:
+      change.toFixed(2) +
+      "%"
+  });
+
+  rules.push({
     name: "Volatility",
     passed: true,
-    detail: "Within safety limit"
+    detail:
+      "Within safety limit"
   });
 
   let signal = "WAIT";
+
   let reason =
     "Indicators do not agree strongly enough.";
 
   if (longScore >= 4) {
+
     signal = "LONG";
+
     reason =
       "Trend and momentum conditions favour upside.";
   }
 
   if (shortScore >= 4) {
+
     signal = "SHORT";
+
     reason =
       "Trend and momentum conditions favour downside.";
   }
 
   rules.push({
-    name: "Entry Confirmation",
+    name:
+      "Entry Confirmation",
+
     passed:
       signal !== "WAIT",
+
     detail:
       signal === "WAIT"
         ? "No confirmed entry"
-        : signal + " confirmed"
+        : signal +
+          " confirmed"
   });
 
   return {
     signal,
+
     score:
       Math.max(
         longScore,
         shortScore
       ),
+
     reason,
     rules
   };
@@ -269,34 +412,47 @@ function determineSignal() {
 
 function tradePnl() {
 
-  if (!state.openTrade ||
-      !market)
+  if (
+    !state.openTrade ||
+    !market
+  )
     return 0;
 
   const t =
     state.openTrade;
 
-  if (t.side === "LONG") {
+  if (
+    t.side === "LONG"
+  ) {
+
     return (
       market.price -
       t.entry
-    ) * t.quantity;
+    ) *
+    t.quantity;
   }
 
   return (
     t.entry -
     market.price
-  ) * t.quantity;
+  ) *
+  t.quantity;
 }
 
 function getPortfolioValue() {
 
   let total =
-    state.cash;
+    Number(
+      state.cash || 0
+    );
 
   if (state.openTrade) {
+
     total +=
-      state.openTrade.positionValue +
+      Number(
+        state.openTrade
+          .positionValue || 0
+      ) +
       tradePnl();
   }
 
@@ -308,25 +464,33 @@ function updateDrawdown() {
   const total =
     getPortfolioValue();
 
-  if (total >
-      state.peakPortfolio) {
+  if (
+    total >
+    state.peakPortfolio
+  ) {
+
     state.peakPortfolio =
       total;
   }
 
   const drawdown =
     state.peakPortfolio > 0
+
       ? (
-        (
-          state.peakPortfolio -
-          total
-        ) /
-        state.peakPortfolio
-      ) * 100
+          (
+            state.peakPortfolio -
+            total
+          ) /
+          state.peakPortfolio
+        ) * 100
+
       : 0;
 
-  if (drawdown >
-      state.maxDrawdown) {
+  if (
+    drawdown >
+    state.maxDrawdown
+  ) {
+
     state.maxDrawdown =
       drawdown;
   }
@@ -334,8 +498,10 @@ function updateDrawdown() {
 
 function openTrade(side) {
 
-  if (state.openTrade ||
-      !market)
+  if (
+    state.openTrade ||
+    !market
+  )
     return;
 
   const entry =
@@ -356,8 +522,10 @@ function openTrade(side) {
     quantity *
     entry;
 
-  if (positionValue >
-      state.cash) {
+  if (
+    positionValue >
+    state.cash
+  ) {
 
     positionValue =
       state.cash;
@@ -370,7 +538,9 @@ function openTrade(side) {
   let stop;
   let target;
 
-  if (side === "LONG") {
+  if (
+    side === "LONG"
+  ) {
 
     stop =
       entry * 0.975;
@@ -394,7 +564,11 @@ function openTrade(side) {
     target,
     quantity,
     positionValue,
-    openedAt: Date.now()
+
+    riskCash,
+
+    openedAt:
+      Date.now()
   };
 
   state.cash -=
@@ -411,8 +585,10 @@ function openTrade(side) {
 
 function closeTrade(reason) {
 
-  if (!state.openTrade ||
-      !market)
+  if (
+    !state.openTrade ||
+    !market
+  )
     return;
 
   const t =
@@ -421,25 +597,58 @@ function closeTrade(reason) {
   const pnl =
     tradePnl();
 
+  const returnPercent =
+    t.positionValue
+      ? (
+          pnl /
+          t.positionValue
+        ) * 100
+      : 0;
+
+  const durationMs =
+    Date.now() -
+    t.openedAt;
+
   state.cash +=
     t.positionValue +
     pnl;
 
   state.history.unshift({
-    side: t.side,
-    entry: t.entry,
-    exit: market.price,
-    quantity: t.quantity,
+    side:
+      t.side,
+
+    entry:
+      t.entry,
+
+    exit:
+      market.price,
+
+    quantity:
+      t.quantity,
+
+    positionValue:
+      t.positionValue,
+
     pnl,
+
+    returnPercent,
+
     reason,
-    openedAt: t.openedAt,
-    closedAt: Date.now()
+
+    openedAt:
+      t.openedAt,
+
+    closedAt:
+      Date.now(),
+
+    durationMs
   });
 
   console.log(
     "PAPER TRADE CLOSED:",
     reason,
-    pnl
+    "P&L:",
+    pnl.toFixed(2)
   );
 
   state.openTrade =
@@ -451,8 +660,10 @@ function closeTrade(reason) {
 
 function checkOpenTrade() {
 
-  if (!state.openTrade ||
-      !market)
+  if (
+    !state.openTrade ||
+    !market
+  )
     return;
 
   const t =
@@ -460,33 +671,52 @@ function checkOpenTrade() {
 
   if (
     t.side === "LONG" &&
-    market.price <= t.stop
+    market.price <=
+      t.stop
   ) {
-    closeTrade("Stop loss");
+
+    closeTrade(
+      "Stop loss"
+    );
+
     return;
   }
 
   if (
     t.side === "LONG" &&
-    market.price >= t.target
+    market.price >=
+      t.target
   ) {
-    closeTrade("Take profit");
+
+    closeTrade(
+      "Take profit"
+    );
+
     return;
   }
 
   if (
     t.side === "SHORT" &&
-    market.price >= t.stop
+    market.price >=
+      t.stop
   ) {
-    closeTrade("Stop loss");
+
+    closeTrade(
+      "Stop loss"
+    );
+
     return;
   }
 
   if (
     t.side === "SHORT" &&
-    market.price <= t.target
+    market.price <=
+      t.target
   ) {
-    closeTrade("Take profit");
+
+    closeTrade(
+      "Take profit"
+    );
   }
 }
 
@@ -514,8 +744,10 @@ async function loadMarket() {
         fetch(chartUrl)
       ]);
 
-    if (!simpleRes.ok ||
-        !chartRes.ok) {
+    if (
+      !simpleRes.ok ||
+      !chartRes.ok
+    ) {
 
       throw new Error(
         "CoinGecko request failed"
@@ -558,20 +790,95 @@ async function loadMarket() {
   }
 }
 
-async function tradingCycle() {
+function recordAnalysis(
+  decision,
+  source = "automatic"
+) {
 
-  if (!state.automation)
-    return;
+  const ind =
+    getIndicators();
 
-  console.log(
-    "Running automated paper analysis..."
+  const record = {
+    time:
+      Date.now(),
+
+    source,
+
+    price:
+      market
+        ? market.price
+        : null,
+
+    change24:
+      market
+        ? market.change
+        : null,
+
+    shortMA:
+      ind
+        ? ind.shortMA
+        : null,
+
+    longMA:
+      ind
+        ? ind.longMA
+        : null,
+
+    rsi:
+      ind
+        ? ind.rsi
+        : null,
+
+    signal:
+      decision.signal,
+
+    score:
+      decision.score,
+
+    reason:
+      decision.reason,
+
+    openTrade:
+      state.openTrade
+        ? state.openTrade.side
+        : null,
+
+    portfolio:
+      getPortfolioValue()
+  };
+
+  state.analysisHistory.unshift(
+    record
   );
+
+  if (
+    state.analysisHistory.length >
+    MAX_ANALYSIS_HISTORY
+  ) {
+
+    state.analysisHistory =
+      state.analysisHistory.slice(
+        0,
+        MAX_ANALYSIS_HISTORY
+      );
+  }
+
+  state.analysisCycles =
+    Number(
+      state.analysisCycles || 0
+    ) + 1;
+}
+
+async function performAnalysis(
+  source = "automatic",
+  allowEntry = true
+) {
 
   const loaded =
     await loadMarket();
 
   if (!loaded)
-    return;
+    return false;
 
   checkOpenTrade();
 
@@ -587,13 +894,22 @@ async function tradingCycle() {
   state.lastDecision =
     decision;
 
+  recordAnalysis(
+    decision,
+    source
+  );
+
   if (
+    allowEntry &&
     !state.openTrade &&
     (
-      decision.signal === "LONG" ||
-      decision.signal === "SHORT"
+      decision.signal ===
+        "LONG" ||
+      decision.signal ===
+        "SHORT"
     )
   ) {
+
     openTrade(
       decision.signal
     );
@@ -601,6 +917,25 @@ async function tradingCycle() {
 
   updateDrawdown();
   saveState();
+
+  return true;
+}
+
+async function tradingCycle() {
+
+  if (
+    !state.automation
+  )
+    return;
+
+  console.log(
+    "Running automated v0.8 paper analysis..."
+  );
+
+  await performAnalysis(
+    "automatic",
+    true
+  );
 }
 
 function performance() {
@@ -618,31 +953,132 @@ function performance() {
       x => x.pnl < 0
     ).length;
 
+  const breakEven =
+    state.history.filter(
+      x => x.pnl === 0
+    ).length;
+
   const realizedPnl =
     state.history.reduce(
-      (sum, x) =>
-        sum + x.pnl,
+      (
+        sum,
+        x
+      ) =>
+        sum +
+        Number(
+          x.pnl || 0
+        ),
+
       0
     );
+
+  const grossProfit =
+    state.history
+      .filter(
+        x => x.pnl > 0
+      )
+      .reduce(
+        (
+          sum,
+          x
+        ) =>
+          sum + x.pnl,
+
+        0
+      );
+
+  const grossLoss =
+    Math.abs(
+      state.history
+        .filter(
+          x => x.pnl < 0
+        )
+        .reduce(
+          (
+            sum,
+            x
+          ) =>
+            sum + x.pnl,
+
+          0
+        )
+    );
+
+  const averagePnl =
+    total
+      ? realizedPnl /
+        total
+      : 0;
+
+  const profitFactor =
+    grossLoss > 0
+      ? grossProfit /
+        grossLoss
+      : grossProfit > 0
+      ? null
+      : 0;
 
   return {
     total,
     wins,
     losses,
+    breakEven,
 
     winRate:
       total
-        ? (wins / total) * 100
+        ? (
+            wins /
+            total
+          ) * 100
         : 0,
 
-    realizedPnl
+    realizedPnl,
+    grossProfit,
+    grossLoss,
+    averagePnl,
+    profitFactor
+  };
+}
+
+function signalStats() {
+
+  const records =
+    state.analysisHistory || [];
+
+  return {
+    total:
+      records.length,
+
+    long:
+      records.filter(
+        x =>
+          x.signal ===
+          "LONG"
+      ).length,
+
+    short:
+      records.filter(
+        x =>
+          x.signal ===
+          "SHORT"
+      ).length,
+
+    wait:
+      records.filter(
+        x =>
+          x.signal ===
+          "WAIT"
+      ).length
   };
 }
 
 function apiState() {
 
   return {
-    version: "0.7",
+    version: "0.8",
+
+    schemaVersion:
+      state.schemaVersion,
 
     automation:
       state.automation,
@@ -663,15 +1099,21 @@ function apiState() {
 
     openTrade:
       state.openTrade
+
         ? {
-          ...state.openTrade,
-          currentPnl:
-            tradePnl()
-        }
+            ...state.openTrade,
+
+            currentPnl:
+              tradePnl()
+          }
+
         : null,
 
     history:
-      state.history.slice(0, 30),
+      state.history.slice(
+        0,
+        50
+      ),
 
     performance:
       performance(),
@@ -685,6 +1127,21 @@ function apiState() {
     lastMarketUpdate:
       state.lastMarketUpdate,
 
+    analysisCycles:
+      state.analysisCycles,
+
+    signalStats:
+      signalStats(),
+
+    analysisHistory:
+      state.analysisHistory.slice(
+        0,
+        100
+      ),
+
+    serverStartedAt:
+      state.startedAt,
+
     serverTime:
       Date.now(),
 
@@ -692,7 +1149,10 @@ function apiState() {
       false,
 
     leverage:
-      false
+      false,
+
+    riskPercent:
+      RISK_PERCENT
   };
 }
 
@@ -707,13 +1167,16 @@ function sendJson(
     {
       "Content-Type":
         "application/json",
+
       "Cache-Control":
         "no-store"
     }
   );
 
   res.end(
-    JSON.stringify(data)
+    JSON.stringify(
+      data
+    )
   );
 }
 
@@ -722,37 +1185,52 @@ function serveStatic(
   res
 ) {
 
+  let requestPath =
+    req.url.split("?")[0];
+
   let filePath =
-    req.url === "/"
+    requestPath === "/"
       ? "/index.html"
-      : req.url;
+      : requestPath;
+
+  const publicDir =
+    path.join(
+      __dirname,
+      "public"
+    );
 
   filePath =
     path.join(
-      __dirname,
-      "public",
+      publicDir,
       filePath
     );
 
-  if (!filePath.startsWith(
-      path.join(
-        __dirname,
-        "public"
-      )
-    )) {
+  if (
+    !filePath.startsWith(
+      publicDir
+    )
+  ) {
 
     res.writeHead(403);
-    res.end("Forbidden");
+
+    res.end(
+      "Forbidden"
+    );
+
     return;
   }
 
   fs.readFile(
     filePath,
-    (err, data) => {
+    (
+      err,
+      data
+    ) => {
 
       if (err) {
 
         res.writeHead(404);
+
         res.end(
           "Not found"
         );
@@ -768,10 +1246,15 @@ function serveStatic(
       const types = {
         ".html":
           "text/html",
+
         ".css":
           "text/css",
+
         ".js":
-          "application/javascript"
+          "application/javascript",
+
+        ".json":
+          "application/json"
       };
 
       res.writeHead(
@@ -779,7 +1262,10 @@ function serveStatic(
         {
           "Content-Type":
             types[ext] ||
-            "text/plain"
+            "text/plain",
+
+          "Cache-Control":
+            "no-store"
         }
       );
 
@@ -790,11 +1276,16 @@ function serveStatic(
 
 const server =
   http.createServer(
-    async (req, res) => {
+    async (
+      req,
+      res
+    ) => {
 
       if (
-        req.method === "GET" &&
-        req.url === "/api/state"
+        req.method ===
+          "GET" &&
+        req.url ===
+          "/api/state"
       ) {
 
         sendJson(
@@ -807,8 +1298,35 @@ const server =
       }
 
       if (
-        req.method === "POST" &&
-        req.url === "/api/start"
+        req.method ===
+          "GET" &&
+        req.url ===
+          "/api/health"
+      ) {
+
+        sendJson(
+          res,
+          200,
+          {
+            ok: true,
+            version: "0.8",
+            automation:
+              state.automation,
+            serverTime:
+              Date.now(),
+            lastAnalysis:
+              state.lastAnalysis
+          }
+        );
+
+        return;
+      }
+
+      if (
+        req.method ===
+          "POST" &&
+        req.url ===
+          "/api/start"
       ) {
 
         state.automation =
@@ -816,7 +1334,10 @@ const server =
 
         saveState();
 
-        await tradingCycle();
+        await performAnalysis(
+          "automation-start",
+          true
+        );
 
         sendJson(
           res,
@@ -831,8 +1352,10 @@ const server =
       }
 
       if (
-        req.method === "POST" &&
-        req.url === "/api/stop"
+        req.method ===
+          "POST" &&
+        req.url ===
+          "/api/stop"
       ) {
 
         state.automation =
@@ -853,27 +1376,16 @@ const server =
       }
 
       if (
-        req.method === "POST" &&
-        req.url === "/api/analyze"
+        req.method ===
+          "POST" &&
+        req.url ===
+          "/api/analyze"
       ) {
 
-        await loadMarket();
-
-        const decision =
-          determineSignal();
-
-        state.lastAnalysis =
-          Date.now();
-
-        state.lastSignal =
-          decision.signal;
-
-        state.lastDecision =
-          decision;
-
-        checkOpenTrade();
-        updateDrawdown();
-        saveState();
+        await performAnalysis(
+          "manual",
+          false
+        );
 
         sendJson(
           res,
@@ -885,12 +1397,18 @@ const server =
       }
 
       if (
-        req.method === "POST" &&
-        req.url === "/api/close"
+        req.method ===
+          "POST" &&
+        req.url ===
+          "/api/close"
       ) {
 
-        if (state.openTrade) {
+        if (
+          state.openTrade
+        ) {
+
           await loadMarket();
+
           closeTrade(
             "Manual close"
           );
@@ -914,29 +1432,41 @@ const server =
 
 loadState();
 
+loadMarket()
+  .then(() => {
+
+    checkOpenTrade();
+
+    updateDrawdown();
+
+    saveState();
+  });
+
 setInterval(
   tradingCycle,
   60 * 1000
 );
-
-loadMarket()
-  .then(() => {
-    checkOpenTrade();
-    updateDrawdown();
-    saveState();
-  });
 
 server.listen(
   PORT,
   () => {
 
     console.log(
-      "Chinab's AI Trade Platform v0.7 running on port",
+      "Chinab's AI Trade Platform v0.8 running on port",
       PORT
     );
 
     console.log(
+      "PAPER TRADING ONLY"
+    );
+
+    console.log(
       "LIVE TRADING: OFF"
+    );
+
+    console.log(
+      "State file:",
+      STATE_FILE
     );
   }
 );
