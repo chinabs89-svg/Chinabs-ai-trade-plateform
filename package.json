@@ -1,0 +1,12 @@
+{
+  "name": "chinabs-ai-trade-platform",
+  "version": "0.7.0",
+  "description": "Server-side automated BTC/CAD paper trading platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
