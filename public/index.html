@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width,initial-scale=1">
+
+<title>Chinab's AI Trade Platform v0.7</title>
+
+<style>
+
+*{box-sizing:border-box}
+
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#07111f;
+color:white
+}
+
+header{
+padding:22px;
+background:#0d1b2a;
+border-bottom:1px solid #25354a
+}
+
+header h1{
+margin:0;
+font-size:24px
+}
+
+header p{
+color:#9fb0c5;
+margin-bottom:0
+}
+
+.container{
+padding:18px;
+max-width:1100px;
+margin:auto
+}
+
+.warning{
+background:#30260b;
+border:1px solid #7c6418;
+padding:14px;
+border-radius:14px;
+margin-bottom:18px
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+gap:14px
+}
+
+.card,.panel{
+background:#101d2d;
+border:1px solid #26384e;
+padding:18px;
+border-radius:16px
+}
+
+.panel{
+margin-top:18px
+}
+
+.label{
+color:#94a7bd;
+font-size:14px
+}
+
+.value{
+font-size:27px;
+font-weight:bold;
+margin-top:8px
+}
+
+.green{color:#36d399}
+.red{color:#ff6b6b}
+.yellow{color:#f5c451}
+.blue{color:#60a5fa}
+
+button{
+width:100%;
+padding:15px;
+margin-top:12px;
+border:0;
+border-radius:10px;
+font-size:16px;
+font-weight:bold;
+cursor:pointer
+}
+
+.primary{
+background:#3b82f6;
+color:white
+}
+
+.success{
+background:#16a36a;
+color:white
+}
+
+.danger{
+background:#c84d4d;
+color:white
+}
+
+.secondary{
+background:#27384d;
+color:white
+}
+
+.row{
+display:flex;
+justify-content:space-between;
+gap:12px;
+padding:10px 0;
+border-bottom:1px solid #1e3045
+}
+
+.row:last-child{
+border-bottom:0
+}
+
+.signal-box,.trade-card{
+margin-top:14px;
+padding:15px;
+border-radius:12px;
+background:#0a1625;
+border:1px solid #2a3a50
+}
+
+.small{
+color:#94a7bd;
+font-size:13px;
+line-height:1.5
+}
+
+.history-item{
+padding:12px 0;
+border-bottom:1px solid #1e3045
+}
+
+footer{
+text-align:center;
+color:#73869d;
+padding:30px
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<h1>Chinab's AI Trade Platform</h1>
+
+<p>
+24/7 server-side paper-testing engine — Version 0.7
+</p>
+
+</header>
+
+<div class="container">
+
+<div class="warning">
+🧪 PAPER TRADING ONLY — Railway performs simulated analysis in the background. No real money, leverage, bank account or exchange is connected.
+</div>
+
+<div class="grid">
+
+<div class="card">
+<div class="label">Paper Portfolio</div>
+<div class="value" id="portfolio">-</div>
+</div>
+
+<div class="card">
+<div class="label">Available CAD</div>
+<div class="value" id="cash">-</div>
+</div>
+
+<div class="card">
+<div class="label">BTC / CAD</div>
+<div class="value" id="btcPrice">Loading...</div>
+</div>
+
+<div class="card">
+<div class="label">Automation</div>
+<div class="value" id="automationStatus">-</div>
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>🤖 24/7 Auto Paper Trader</h2>
+
+<button
+class="success"
+id="autoButton"
+onclick="toggleAutomation()">
+Loading...
+</button>
+
+<button
+class="primary"
+onclick="analyzeNow()">
+Analyze Now
+</button>
+
+<div id="analysis" class="signal-box">
+Waiting for server analysis...
+</div>
+
+<div class="row">
+<span>Last Server Analysis</span>
+<strong id="lastAnalysis">-</strong>
+</div>
+
+<div class="row">
+<span>Server Heartbeat</span>
+<strong class="green" id="heartbeat">
+Checking...
+</strong>
+</div>
+
+<p class="small">
+The trading engine runs on Railway. Your iPhone does not need to remain unlocked and this webpage does not need to stay open.
+</p>
+
+</div>
+
+<div class="panel">
+
+<h2>📊 Strategy Indicators</h2>
+
+<div class="row">
+<span>24h Change</span>
+<strong id="change24">-</strong>
+</div>
+
+<div class="row">
+<span>Short MA</span>
+<strong id="shortMA">-</strong>
+</div>
+
+<div class="row">
+<span>Long MA</span>
+<strong id="longMA">-</strong>
+</div>
+
+<div class="row">
+<span>RSI-style Momentum</span>
+<strong id="rsi">-</strong>
+</div>
+
+<div class="row">
+<span>Strategy Signal</span>
+<strong id="strategySignal">WAIT</strong>
+</div>
+
+<div id="rules" class="signal-box">
+Waiting for rule analysis...
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>📈 Open Paper Trade</h2>
+
+<div id="openTradeArea">
+<p class="small">
+No open paper trade.
+</p>
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>🏆 Performance Dashboard</h2>
+
+<div class="row">
+<span>Total Trades</span>
+<strong id="totalTrades">0</strong>
+</div>
+
+<div class="row">
+<span>Wins</span>
+<strong id="wins">0</strong>
+</div>
+
+<div class="row">
+<span>Losses</span>
+<strong id="losses">0</strong>
+</div>
+
+<div class="row">
+<span>Win Rate</span>
+<strong id="winRate">0%</strong>
+</div>
+
+<div class="row">
+<span>Realized P&amp;L</span>
+<strong id="realizedPnl">$0.00</strong>
+</div>
+
+<div class="row">
+<span>Maximum Drawdown</span>
+<strong id="maxDrawdown">0.00%</strong>
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>🧾 Trade History</h2>
+
+<div id="history">
+<p class="small">
+No completed trades yet.
+</p>
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>🛡️ Safety Rules</h2>
+
+<div class="row">
+<span>Risk per trade</span>
+<strong>0.75%</strong>
+</div>
+
+<div class="row">
+<span>Maximum simultaneous trades</span>
+<strong>1</strong>
+</div>
+
+<div class="row">
+<span>Extreme-volatility filter</span>
+<strong class="green">ON</strong>
+</div>
+
+<div class="row">
+<span>Leverage</span>
+<strong class="green">OFF</strong>
+</div>
+
+<div class="row">
+<span>Live trading</span>
+<strong class="red">OFF</strong>
+</div>
+
+</div>
+
+</div>
+
+<footer>
+Chinab's AI Trade Platform — Version 0.7
+</footer>
+
+<script>
+
+let latest = null;
+
+function money(n){
+
+return "$" +
+Number(n || 0).toLocaleString(
+"en-CA",
+{
+minimumFractionDigits:2,
+maximumFractionDigits:2
+}
+);
+
+}
+
+function timeText(ts){
+
+if(!ts)
+return "Not yet";
+
+return new Date(ts).toLocaleString();
+
+}
+
+async function api(url,method="GET"){
+
+const res =
+await fetch(
+url,
+{
+method,
+headers:{
+"Content-Type":"application/json"
+}
+}
+);
+
+if(!res.ok)
+throw new Error("Server request failed");
+
+return res.json();
+
+}
+
+async function refresh(){
+
+try{
+
+latest =
+await api("/api/state");
+
+render();
+
+document
+.getElementById("heartbeat")
+.innerText =
+"● SERVER ONLINE";
+
+document
+.getElementById("heartbeat")
+.className =
+"green";
+
+}catch(err){
+
+document
+.getElementById("heartbeat")
+.innerText =
+"SERVER UNAVAILABLE";
+
+document
+.getElementById("heartbeat")
+.className =
+"red";
+
+}
+
+}
+
+function render(){
+
+const d = latest;
+
+if(!d)
+return;
+
+document
+.getElementById("portfolio")
+.innerText =
+money(d.portfolio);
+
+document
+.getElementById("cash")
+.innerText =
+money(d.cash);
+
+document
+.getElementById("btcPrice")
+.innerText =
+d.market
+? money(d.market.price)
+: "Unavailable";
+
+const status =
+document.getElementById("automationStatus");
+
+const button =
+document.getElementById("autoButton");
+
+if(d.automation){
+
+status.innerHTML =
+'<span class="green">ON</span>';
+
+button.innerText =
+"Stop Automated Paper Testing";
+
+button.className =
+"danger";
+
+}else{
+
+status.innerText =
+"OFF";
+
+button.innerText =
+"Start 24/7 Automated Paper Testing";
+
+button.className =
+"success";
+
+}
+
+document
+.getElementById("lastAnalysis")
+.innerText =
+timeText(d.lastAnalysis);
+
+if(d.market){
+
+document
+.getElementById("change24")
+.innerText =
+Number(d.market.change).toFixed(2) + "%";
+
+}
+
+if(d.indicators){
+
+document
+.getElementById("shortMA")
+.innerText =
+money(d.indicators.shortMA);
+
+document
+.getElementById("longMA")
+.innerText =
+money(d.indicators.longMA);
+
+document
+.getElementById("rsi")
+.innerText =
+Number(d.indicators.rsi).toFixed(1);
+
+}
+
+renderDecision(d.decision);
+renderTrade(d.openTrade);
+renderPerformance(d);
+renderHistory(d.history || []);
+
+}
+
+function renderDecision(decision){
+
+if(!decision)
+return;
+
+const signal =
+decision.signal;
+
+const color =
+signal === "LONG"
+? "green"
+: signal === "SHORT"
+? "red"
+: "yellow";
+
+const signalEl =
+document.getElementById("strategySignal");
+
+signalEl.innerText =
+signal;
+
+signalEl.className =
+color;
+
+document
+.getElementById("analysis")
+.innerHTML = `
+
+<h2 class="${color}">
+${signal}
+</h2>
+
+<div class="row">
+<span>Rule Agreement</span>
+<strong>${decision.score}/5</strong>
+</div>
+
+<p>${decision.reason}</p>
+
+<p class="small">
+Experimental paper-trading logic. Rule agreement is not a probability of profit.
+</p>
+
+`;
+
+const rules =
+decision.rules || [];
+
+document
+.getElementById("rules")
+.innerHTML =
+rules.length
+? rules.map(
+r => `
+
+<div class="row">
+
+<span>
+${r.passed ? "✅" : "❌"}
+${r.name}
+</span>
+
+<strong>
+${r.detail}
+</strong>
+
+</div>
+
+`
+).join("")
+: "No rule data yet.";
+
+}
+
+function renderTrade(trade){
+
+const area =
+document.getElementById("openTradeArea");
+
+if(!trade){
+
+area.innerHTML =
+'<p class="small">No open paper trade.</p>';
+
+return;
+
+}
+
+area.innerHTML = `
+
+<div class="trade-card">
+
+<div class="row">
+<span>Side</span>
+<strong class="${
+trade.side === "LONG"
+? "green"
+: "red"
+}">
+${trade.side}
+</strong>
+</div>
+
+<div class="row">
+<span>Entry</span>
+<strong>${money(trade.entry)}</strong>
+</div>
+
+<div class="row">
+<span>Position</span>
+<strong>
+${Number(trade.quantity).toFixed(6)} BTC
+</strong>
+</div>
+
+<div class="row">
+<span>P&amp;L</span>
+<strong class="${
+trade.currentPnl >= 0
+? "green"
+: "red"
+}">
+${money(trade.currentPnl)}
+</strong>
+</div>
+
+<div class="row">
+<span>Stop</span>
+<strong class="red">
+${money(trade.stop)}
+</strong>
+</div>
+
+<div class="row">
+<span>Target</span>
+<strong class="green">
+${money(trade.target)}
+</strong>
+</div>
+
+<button
+class="secondary"
+onclick="closeTrade()">
+Close Paper Trade
+</button>
+
+</div>
+
+`;
+
+}
+
+function renderPerformance(d){
+
+const p = d.performance;
+
+if(!p)
+return;
+
+document
+.getElementById("totalTrades")
+.innerText =
+p.total;
+
+document
+.getElementById("wins")
+.innerText =
+p.wins;
+
+document
+.getElementById("losses")
+.innerText =
+p.losses;
+
+document
+.getElementById("winRate")
+.innerText =
+Number(p.winRate).toFixed(1) + "%";
+
+document
+.getElementById("realizedPnl")
+.innerText =
+money(p.realizedPnl);
+
+document
+.getElementById("maxDrawdown")
+.innerText =
+Number(d.maxDrawdown || 0).toFixed(2) + "%";
+
+}
+
+function renderHistory(history){
+
+const area =
+document.getElementById("history");
+
+if(!history.length){
+
+area.innerHTML =
+'<p class="small">No completed trades yet.</p>';
+
+return;
+
+}
+
+area.innerHTML =
+history.map(
+t => `
+
+<div class="history-item">
+
+<div class="row">
+
+<span>${t.side}</span>
+
+<strong class="${
+t.pnl >= 0
+? "green"
+: "red"
+}">
+${money(t.pnl)}
+</strong>
+
+</div>
+
+<div class="small">
+
+${money(t.entry)}
+→
+${money(t.exit)}
+
+<br>
+
+${t.reason}
+
+<br>
+
+${timeText(t.closedAt)}
+
+</div>
+
+</div>
+
+`
+).join("");
+
+}
+
+async function toggleAutomation(){
+
+if(!latest)
+return;
+
+try{
+
+const endpoint =
+latest.automation
+? "/api/stop"
+: "/api/start";
+
+await api(endpoint,"POST");
+
+await refresh();
+
+}catch(err){
+
+alert(
+"Could not change automation status."
+);
+
+}
+
+}
+
+async function analyzeNow(){
+
+try{
+
+await api(
+"/api/analyze",
+"POST"
+);
+
+await refresh();
+
+}catch(err){
+
+alert(
+"Analysis request failed."
+);
+
+}
+
+}
+
+async function closeTrade(){
+
+try{
+
+await api(
+"/api/close",
+"POST"
+);
+
+await refresh();
+
+}catch(err){
+
+alert(
+"Could not close paper trade."
+);
+
+}
+
+}
+
+refresh();
+
+setInterval(
+refresh,
+10000
+);
+
+</script>
+
+</body>
+
+</html>
