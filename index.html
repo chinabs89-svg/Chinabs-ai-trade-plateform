@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chinab's AI Trade Platform</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chinab's AI Trade Platform v0.2</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -53,12 +51,15 @@
       gap: 15px;
     }
 
-    .card {
+    .card,
+    .panel {
       background: #101d2d;
       border: 1px solid #26384e;
       padding: 18px;
       border-radius: 16px;
     }
+
+    .panel { margin-top: 18px; }
 
     .label {
       color: #94a7bd;
@@ -71,21 +72,10 @@
       margin-top: 8px;
     }
 
-    .green {
-      color: #36d399;
-    }
-
-    .red {
-      color: #ff6b6b;
-    }
-
-    .ai-box {
-      margin-top: 18px;
-      background: #101d2d;
-      border-radius: 16px;
-      padding: 20px;
-      border: 1px solid #26384e;
-    }
+    .green { color: #36d399; }
+    .red { color: #ff6b6b; }
+    .yellow { color: #f5c451; }
+    .blue { color: #60a5fa; }
 
     button {
       width: 100%;
@@ -103,18 +93,34 @@
       color: white;
     }
 
-    .trade {
-      background: #19b978;
+    select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 8px;
+      background: #07111f;
       color: white;
+      border: 1px solid #33465e;
+      font-size: 16px;
     }
 
-    .risk {
+    .signal-box {
       margin-top: 18px;
-      padding: 18px;
-      border-radius: 16px;
-      background: #101d2d;
-      border: 1px solid #26384e;
+      padding: 16px;
+      border-radius: 12px;
+      background: #0a1625;
+      border: 1px solid #2a3a50;
     }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid #1e3045;
+    }
+
+    .row:last-child { border-bottom: 0; }
 
     footer {
       text-align: center;
@@ -128,13 +134,13 @@
 
 <header>
   <h1>Chinab's AI Trade Platform</h1>
-  <p>AI-assisted market analysis & paper trading</p>
+  <p>Live market analysis & paper trading — Version 0.2</p>
 </header>
 
 <div class="container">
 
   <div class="warning">
-    🧪 PAPER TRADING MODE — No real money is being traded.
+    🧪 PAPER TRADING ONLY — No real money is being traded.
   </div>
 
   <div class="grid">
@@ -145,43 +151,72 @@
     </div>
 
     <div class="card">
-      <div class="label">Today's P&L</div>
-      <div class="value green">+$0.00</div>
+      <div class="label">BTC / CAD Live Price</div>
+      <div class="value" id="btcPrice">Loading...</div>
     </div>
 
     <div class="card">
-      <div class="label">Open Trades</div>
-      <div class="value">0</div>
+      <div class="label">24h Change</div>
+      <div class="value" id="change24h">Loading...</div>
     </div>
 
     <div class="card">
       <div class="label">AI Status</div>
-      <div class="value green">Monitoring</div>
+      <div class="value green" id="aiStatus">Monitoring</div>
     </div>
 
   </div>
 
-  <div class="ai-box">
+  <div class="panel">
 
     <h2>🤖 AI Trading Center</h2>
 
-    <p class="label">Market being analyzed</p>
-    <h3>BTC / CAD</h3>
+    <div class="label">Choose trade horizon</div>
 
-    <p>
-      The AI engine will analyze market trend, momentum,
-      volatility and risk before suggesting a trade.
-    </p>
+    <select id="tradeHorizon">
+      <option value="1">1 Day</option>
+      <option value="2">2 Days</option>
+      <option value="3">3 Days</option>
+      <option value="4">4 Days</option>
+    </select>
 
-    <button class="scan" onclick="scanMarket()">
-      Analyze Market
+    <button class="scan" onclick="analyzeMarket()">
+      Analyze BTC/CAD
     </button>
 
-    <div id="signal"></div>
+    <div class="signal-box" id="signalBox">
+      Waiting for analysis...
+    </div>
 
   </div>
 
-  <div class="risk">
+  <div class="panel">
+
+    <h2>📊 Market Metrics</h2>
+
+    <div class="row">
+      <span>Current Price</span>
+      <strong id="metricPrice">-</strong>
+    </div>
+
+    <div class="row">
+      <span>24h Change</span>
+      <strong id="metricChange">-</strong>
+    </div>
+
+    <div class="row">
+      <span>Trend</span>
+      <strong id="metricTrend">-</strong>
+    </div>
+
+    <div class="row">
+      <span>Volatility</span>
+      <strong id="metricVolatility">-</strong>
+    </div>
+
+  </div>
+
+  <div class="panel">
 
     <h2>🛡️ Risk Control</h2>
 
@@ -194,27 +229,200 @@
 </div>
 
 <footer>
-  Chinab's AI Trade Platform — Version 0.1
+  Chinab's AI Trade Platform — Version 0.2
 </footer>
 
 <script>
 
-function scanMarket() {
+let marketData = null;
 
-  const signals = [
-    "WAIT — No strong setup detected.",
-    "WATCH — Bullish momentum developing.",
-    "WATCH — Bearish pressure detected.",
-    "WAIT — Volatility is currently too high."
-  ];
+async function loadMarketData() {
 
-  const result =
-    signals[Math.floor(Math.random() * signals.length)];
+  try {
 
-  document.getElementById("signal").innerHTML =
-    "<h3>AI Signal</h3><p>" + result + "</p>";
+    const url =
+      "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=cad&include_24hr_change=true";
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    marketData = {
+      price: data.bitcoin.cad,
+      change: data.bitcoin.cad_24h_change
+    };
+
+    document.getElementById("btcPrice").innerText =
+      "$" + marketData.price.toLocaleString("en-CA", {
+        maximumFractionDigits: 2
+      });
+
+    const changeEl = document.getElementById("change24h");
+
+    changeEl.innerText =
+      marketData.change.toFixed(2) + "%";
+
+    changeEl.className =
+      "value " + (marketData.change >= 0 ? "green" : "red");
+
+    document.getElementById("metricPrice").innerText =
+      "$" + marketData.price.toLocaleString("en-CA", {
+        maximumFractionDigits: 2
+      });
+
+    document.getElementById("metricChange").innerText =
+      marketData.change.toFixed(2) + "%";
+
+    updateBasicMetrics();
+
+  } catch (error) {
+
+    document.getElementById("btcPrice").innerText = "Data unavailable";
+    document.getElementById("change24h").innerText = "-";
+    console.error(error);
+
+  }
 
 }
+
+function updateBasicMetrics() {
+
+  if (!marketData) return;
+
+  let trend;
+
+  if (marketData.change > 2) {
+    trend = "Bullish";
+  } else if (marketData.change < -2) {
+    trend = "Bearish";
+  } else {
+    trend = "Neutral";
+  }
+
+  let volatility;
+
+  const absChange = Math.abs(marketData.change);
+
+  if (absChange >= 5) {
+    volatility = "High";
+  } else if (absChange >= 2) {
+    volatility = "Medium";
+  } else {
+    volatility = "Low";
+  }
+
+  document.getElementById("metricTrend").innerText = trend;
+  document.getElementById("metricVolatility").innerText = volatility;
+
+}
+
+function analyzeMarket() {
+
+  if (!marketData) {
+    alert("Market data is still loading.");
+    return;
+  }
+
+  document.getElementById("aiStatus").innerText = "Analyzing...";
+
+  const horizon =
+    Number(document.getElementById("tradeHorizon").value);
+
+  const price = marketData.price;
+  const change = marketData.change;
+
+  let signal = "WAIT";
+  let signalClass = "yellow";
+  let reason = "";
+  let stopLoss;
+  let target;
+
+  if (change >= 2) {
+
+    signal = "BUY";
+    signalClass = "green";
+
+    reason =
+      "BTC has positive 24-hour momentum. The paper-trading engine sees bullish pressure.";
+
+    stopLoss = price * 0.97;
+    target = price * (1 + (0.02 * horizon));
+
+  } else if (change <= -2) {
+
+    signal = "SELL / AVOID LONG";
+    signalClass = "red";
+
+    reason =
+      "BTC has negative 24-hour momentum. The paper-trading engine sees bearish pressure.";
+
+    stopLoss = price * 1.03;
+    target = price * (1 - (0.02 * horizon));
+
+  } else {
+
+    signal = "WAIT";
+    signalClass = "yellow";
+
+    reason =
+      "BTC momentum is not strong enough for a paper-trading entry.";
+
+    stopLoss = null;
+    target = null;
+  }
+
+  let html = `
+    <h2 class="${signalClass}">${signal}</h2>
+
+    <div class="row">
+      <span>Time Horizon</span>
+      <strong>${horizon} Day${horizon > 1 ? "s" : ""}</strong>
+    </div>
+
+    <div class="row">
+      <span>Entry Reference</span>
+      <strong>$${price.toLocaleString("en-CA", {
+        maximumFractionDigits: 2
+      })}</strong>
+    </div>
+  `;
+
+  if (stopLoss && target) {
+
+    html += `
+      <div class="row">
+        <span>Paper Stop Loss</span>
+        <strong>$${stopLoss.toLocaleString("en-CA", {
+          maximumFractionDigits: 2
+        })}</strong>
+      </div>
+
+      <div class="row">
+        <span>Paper Target</span>
+        <strong>$${target.toLocaleString("en-CA", {
+          maximumFractionDigits: 2
+        })}</strong>
+      </div>
+    `;
+
+  }
+
+  html += `
+    <p><strong>Reason:</strong> ${reason}</p>
+    <p class="label">
+      This is a simple rule-based signal for testing.
+      It is not a prediction or guarantee of profit.
+    </p>
+  `;
+
+  document.getElementById("signalBox").innerHTML = html;
+
+  document.getElementById("aiStatus").innerText = "Monitoring";
+
+}
+
+loadMarketData();
+
+setInterval(loadMarketData, 60000);
 
 </script>
 
