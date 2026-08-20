@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chinab's AI Trade Platform</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #07111f;
+      color: white;
+    }
+
+    header {
+      padding: 22px;
+      background: #0d1b2a;
+      border-bottom: 1px solid #25354a;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    header p {
+      margin-bottom: 0;
+      color: #9fb0c5;
+    }
+
+    .container {
+      padding: 18px;
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    .warning {
+      background: #30260b;
+      border: 1px solid #7c6418;
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+
+    .card {
+      background: #101d2d;
+      border: 1px solid #26384e;
+      padding: 18px;
+      border-radius: 16px;
+    }
+
+    .label {
+      color: #94a7bd;
+      font-size: 14px;
+    }
+
+    .value {
+      font-size: 28px;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    .green {
+      color: #36d399;
+    }
+
+    .red {
+      color: #ff6b6b;
+    }
+
+    .ai-box {
+      margin-top: 18px;
+      background: #101d2d;
+      border-radius: 16px;
+      padding: 20px;
+      border: 1px solid #26384e;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      margin-top: 12px;
+      border: 0;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .scan {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .trade {
+      background: #19b978;
+      color: white;
+    }
+
+    .risk {
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 16px;
+      background: #101d2d;
+      border: 1px solid #26384e;
+    }
+
+    footer {
+      text-align: center;
+      color: #73869d;
+      padding: 30px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Chinab's AI Trade Platform</h1>
+  <p>AI-assisted market analysis & paper trading</p>
+</header>
+
+<div class="container">
+
+  <div class="warning">
+    🧪 PAPER TRADING MODE — No real money is being traded.
+  </div>
+
+  <div class="grid">
+
+    <div class="card">
+      <div class="label">Paper Portfolio</div>
+      <div class="value">$10,000.00</div>
+    </div>
+
+    <div class="card">
+      <div class="label">Today's P&L</div>
+      <div class="value green">+$0.00</div>
+    </div>
+
+    <div class="card">
+      <div class="label">Open Trades</div>
+      <div class="value">0</div>
+    </div>
+
+    <div class="card">
+      <div class="label">AI Status</div>
+      <div class="value green">Monitoring</div>
+    </div>
+
+  </div>
+
+  <div class="ai-box">
+
+    <h2>🤖 AI Trading Center</h2>
+
+    <p class="label">Market being analyzed</p>
+    <h3>BTC / CAD</h3>
+
+    <p>
+      The AI engine will analyze market trend, momentum,
+      volatility and risk before suggesting a trade.
+    </p>
+
+    <button class="scan" onclick="scanMarket()">
+      Analyze Market
+    </button>
+
+    <div id="signal"></div>
+
+  </div>
+
+  <div class="risk">
+
+    <h2>🛡️ Risk Control</h2>
+
+    <p>Maximum risk per trade: <strong>1%</strong></p>
+    <p>Maximum daily loss: <strong>3%</strong></p>
+    <p>Live trading: <strong class="red">OFF</strong></p>
+
+  </div>
+
+</div>
+
+<footer>
+  Chinab's AI Trade Platform — Version 0.1
+</footer>
+
+<script>
+
+function scanMarket() {
+
+  const signals = [
+    "WAIT — No strong setup detected.",
+    "WATCH — Bullish momentum developing.",
+    "WATCH — Bearish pressure detected.",
+    "WAIT — Volatility is currently too high."
+  ];
+
+  const result =
+    signals[Math.floor(Math.random() * signals.length)];
+
+  document.getElementById("signal").innerHTML =
+    "<h3>AI Signal</h3><p>" + result + "</p>";
+
+}
+
+</script>
+
+</body>
+</html>
