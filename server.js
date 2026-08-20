@@ -17,7 +17,7 @@ let market = null;
 let priceHistory = [];
 
 let state = {
-  schemaVersion: 8,
+  schemaVersion: 9,
 
   cash: STARTING_BALANCE,
   openTrade: null,
