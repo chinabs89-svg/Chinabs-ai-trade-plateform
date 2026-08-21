@@ -6,6 +6,7 @@ const PORT = process.env.PORT || 3000;
 
 const STARTING_BALANCE = 10000;
 const RISK_PERCENT = 0.0075;
+const MAX_POSITION_PERCENT = 0.30;
 const MAX_ANALYSIS_HISTORY = 500;
 
 // Keep the existing filename so v0.8 can reuse v0.7 state.
@@ -519,22 +520,27 @@ function openTrade(side) {
     stopDistance;
 
   let positionValue =
-    quantity *
+  quantity *
+  entry;
+
+const maxPositionValue =
+  Math.min(
+    state.cash,
+    getPortfolioValue() *
+      MAX_POSITION_PERCENT
+  );
+
+if (
+  positionValue >
+  maxPositionValue
+) {
+  positionValue =
+    maxPositionValue;
+
+  quantity =
+    positionValue /
     entry;
-
-  if (
-    positionValue >
-    state.cash
-  ) {
-
-    positionValue =
-      state.cash;
-
-    quantity =
-      positionValue /
-      entry;
   }
-
   let stop;
   let target;
 
