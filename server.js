@@ -367,7 +367,7 @@ function determineSignal() {
   let reason =
     "Indicators do not agree strongly enough.";
 
-  if (longScore >= 4) {
+  if (longScore >= 3) {
 
     signal = "LONG";
 
@@ -375,7 +375,7 @@ function determineSignal() {
       "Trend and momentum conditions favour upside.";
   }
 
-  if (shortScore >= 4) {
+  if (shortScore >= 3) {
 
     signal = "SHORT";
 
