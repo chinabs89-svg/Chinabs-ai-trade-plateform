@@ -242,7 +242,7 @@ function determineSignal() {
   const rules = [];
 
   if (
-    Math.abs(change) >= 8
+    Math.abs(change) >= 10
   ) {
 
     return {
@@ -522,12 +522,20 @@ function openTrade(side) {
   let positionValue =
   quantity *
   entry;
+const cautiousMode =
+  Math.abs(Number(market.change || 0)) >= 8 &&
+  Math.abs(Number(market.change || 0)) < 10;
+
+const positionPercent =
+  cautiousMode
+    ? MAX_POSITION_PERCENT * 0.5
+    : MAX_POSITION_PERCENT;
 
 const maxPositionValue =
   Math.min(
     state.cash,
     getPortfolioValue() *
-      MAX_POSITION_PERCENT
+    positionPercent
   );
 
 if (
